@@ -49,7 +49,17 @@ export function scaleAt(progress: number): number {
  * era-based: the zoom is driven by scale, so the objects should be too.
  */
 
-export type TierId = 'card' | 'die' | 'chassis' | 'rack' | 'hall';
+/**
+ * Order matters and it is physical, not narrative.
+ *
+ * A zoom-OUT must pass through objects of strictly increasing size. My first
+ * pass had card -> die, which is backwards: a die is a component ON a card, so
+ * arriving at one by zooming out is a zoom in. Silicon is the smallest thing
+ * here, so it goes first — and it makes a better opening anyway. You start
+ * looking at the actual chip the $100 bought, then pull back to the board it
+ * is soldered to, the box, the rack, the building.
+ */
+export type TierId = 'die' | 'card' | 'chassis' | 'rack' | 'hall';
 
 export interface Tier {
   id: TierId;
@@ -62,12 +72,31 @@ export interface Tier {
 }
 
 export const TIERS: Tier[] = [
-  { id: 'card',    from: 1,    to: 10,   label: 'GeForce 256',  note: 'A single AGP board. Where the $100 starts.' },
-  { id: 'die',     from: 10,   to: 100,  label: 'G80 / CUDA',   note: 'The die itself, cores made visible.' },
+  { id: 'die',     from: 1,    to: 10,   label: 'The die',      note: 'Silicon. The actual thing the $100 bought.' },
+  { id: 'card',    from: 10,   to: 100,  label: 'GeForce 256',  note: 'The board it is soldered to.' },
   { id: 'chassis', from: 100,  to: 1000, label: 'DGX-1',        note: 'Eight GPUs in one box. AI has a shape now.' },
   { id: 'rack',    from: 1000, to: 5000, label: 'A100 / H100',  note: 'A rack. The unit of purchase becomes the room.' },
   { id: 'hall',    from: 5000, to: Infinity, label: 'Datacenter', note: 'A building. This is what $100 became.' },
 ];
+
+/** Model file for each tier, all normalised to unit size on load. */
+export const TIER_MODEL: Record<TierId, string> = {
+  die:     '/models/tier-die.glb',
+  card:    '/models/tier-card.glb',
+  chassis: '/models/tier-chassis.glb',
+  rack:    '/models/tier-rack.glb',
+  hall:    '/models/tier-hall.glb',
+};
+
+export function tierIndex(id: TierId): number {
+  return TIERS.findIndex((t) => t.id === id);
+}
+
+/** The tier one step further out, or null at the end of the journey. */
+export function nextTier(id: TierId): Tier | null {
+  const i = tierIndex(id);
+  return i >= 0 && i < TIERS.length - 1 ? TIERS[i + 1] : null;
+}
 
 export function tierAt(scale: number): Tier {
   return TIERS.find((t) => scale >= t.from && scale < t.to) ?? TIERS[TIERS.length - 1];
@@ -151,3 +180,37 @@ export function rebase(scale: number, prevOctave = 0): Rebase {
 
 /** Total number of rebases across the whole scroll. */
 export const OCTAVE_COUNT = Math.floor(Math.log(TOTAL_SCALE) / Math.log(OCTAVE));
+
+/**
+ * Rebase against the TIER, not the octave — this is what the renderer uses.
+ *
+ * Octaves are powers of 8 (1, 8, 64, 512…) and tier boundaries are decades
+ * (1, 10, 100, 1000…). They do not line up, and the instrumentation caught
+ * what that costs: crossing scale 8 resets `local` from 7.99 to 1.16 while the
+ * tier is still the die, so the die jumps back up nearly 7x — a visible pop
+ * two units before the model was due to change.
+ *
+ * Tying the rendered scale to position within the tier removes the problem by
+ * construction: the reset and the model swap become the same event. `within`
+ * stays in [1, span] — at most 10 — so float32 is still nowhere near trouble,
+ * and the octave machinery above is now only bookkeeping.
+ */
+export interface TierScale {
+  tier: Tier;
+  /** how far into this tier, 1 at its entry, `span` at its exit */
+  within: number;
+  /** width of the tier in scale terms; 10 for the decade tiers */
+  span: number;
+}
+
+export function tierScale(scale: number, prevTier: TierId | null = null): TierScale {
+  const tier = tierAtHysteretic(scale, prevTier);
+  const span = Number.isFinite(tier.to) ? tier.to / tier.from : 10;
+  // NOT clamped to 1. When hysteresis holds a tier below its entry point —
+  // which is exactly what the 2002 and 2022 crashes do — `within` is
+  // legitimately less than 1 and the model should keep growing. Clamping it
+  // freezes the size while the scale carries on falling, and then the model
+  // jumps 43% the instant hysteresis lets go. Let it go under 1; the range
+  // stays [0.7, 10], which is still nowhere near a precision problem.
+  return { tier, within: scale / tier.from, span };
+}

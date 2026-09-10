@@ -9,9 +9,10 @@ import { Counter } from '@/components/ui/Counter';
 import { Chrome } from '@/components/ui/Chrome';
 import { EventPanel } from '@/components/ui/EventPanel';
 import { TextTimeline } from '@/components/ui/TextTimeline';
+import { ZoomDebug } from '@/components/ui/ZoomDebug';
 
 // WebGL never runs on the server, and we don't want it in the initial bundle.
-const Scene = dynamic(() => import('@/components/scene/Scene').then((m) => m.Scene), {
+const ZoomScene = dynamic(() => import('@/components/scene/ZoomScene').then((m) => m.ZoomScene), {
   ssr: false,
 });
 
@@ -104,7 +105,8 @@ export default function Page() {
       </a>
 
       <div className="stage">
-        {ready && <Scene onOpen={onOpen} dpr={dpr} />}
+        {ready && <ZoomScene dpr={dpr} />}
+        <ZoomDebug />
         <Chrome />
         <Counter />
         <EventPanel openId={openId} onClose={onClose} />
