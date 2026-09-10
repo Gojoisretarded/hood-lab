@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Year of Nvidea · Real-Time Interactive Systems</title>
+<meta name="description" content="An independent studio building real-time interactive systems for the web.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<noscript><p class="noscript">Please enable javascript</p></noscript>
+
+<div id="Stage">
+
+  <!-- Screen-reader mirror of the canvas-driven navigation -->
+  <div class="GLA11y">
+    <nav><a href="#work">Work</a><a href="#contact">Contact</a></nav>
+  </div>
+
+  <!-- Layer 1: DOM content. Sits BEHIND the canvas so the 3D object
+       occludes the headline, which is the reference's signature move. -->
+  <div class="Scroller" id="scroller">
+    <div class="Content" id="content">
+
+      <section class="Panel Hero" id="hero">
+        <p class="scroll-cue">Scroll Down</p>
+      </section>
+
+      <section class="Panel About" id="about">
+        <h1 class="display">Real&#8209;Time<br>Interactive<br>Systems</h1>
+        <div class="about-col">
+          <p>Independent since 2019</p>
+          <p>A small group of engineers and designers<br>who build things that hold sixty frames</p>
+          <p>Graphics, multiplayer and interfaces<br>that behave like objects rather than<br>documents</p>
+        </div>
+      </section>
+
+      <section class="Panel Work" id="work">
+        <h2 class="sec-title">Selected Work</h2>
+        <ul class="work-list" id="workList"></ul>
+      </section>
+
+      <section class="Panel Contact" id="contact">
+        <h2 class="sec-title">Contact</h2>
+        <div class="contact-grid">
+          <a class="contact-link" href="mailto:hello@example.com">hello@example.com</a>
+          <a class="contact-link" href="#" data-noop>Instagram</a>
+          <a class="contact-link" href="#" data-noop>LinkedIn</a>
+        </div>
+        <footer class="foot">
+          <span>© <span id="year"></span> — All rights reserved</span>
+          <span id="fps">—</span>
+        </footer>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Layer 2: the WebGL stage. Transparent; only the object and its
+       bloom are painted, so everything above shows through. -->
+  <canvas id="gl"></canvas>
+
+  <!-- Layer 3: persistent chrome -->
+  <nav class="NavPill" id="navPill">
+    <a class="link" href="#work">Work</a>
+    <span class="rule"></span>
+    <a class="link" href="#contact">Contact</a>
+  </nav>
+
+  <button class="AudioDot" id="audioToggle" aria-label="Toggle audio"><i></i><span>Audio</span></button>
+
+  <!-- Preloader -->
+  <div class="LoaderView" id="loader">
+    <div class="behind" id="loaderField"></div>
+    <div class="text" id="loaderCount">/0</div>
+  </div>
+
+  <!-- Chat (present in the reference's DOM; opens from the pill) -->
+  <div class="ChatDOM" id="chat" data-open="false">
+    <div class="wrapper">
+      <div class="messages" id="chatMessages">
+        <a class="home" data-q="games">-&gt; games</a>
+        <a class="home" data-q="multiplayer">-&gt; multiplayer</a>
+        <a class="home" data-q="xr">-&gt; XR / VR / AI</a>
+        <a class="home" data-q="installations">-&gt; installations</a>
+        <a class="home" data-q="websites">-&gt; websites</a>
+        <p class="prompt">What are you looking for?</p>
+      </div>
+      <div class="input-row">
+        <textarea class="input" id="chatInput" maxlength="100" rows="1" placeholder="Ask me anything..."></textarea>
+        <div class="flashing" id="chatDot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie banner -->
+  <div class="CookieBanner" id="cookie" hidden>
+    <div class="wrapper">
+      <p class="text">Our site uses essential cookies and, with your consent, analytics cookies. Details in <a href="#" data-noop>Privacy Notice.</a></p>
+      <div class="buttons">
+        <button class="decline" id="ckDecline">Decline</button>
+        <button class="accept" id="ckAccept">Accept</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
