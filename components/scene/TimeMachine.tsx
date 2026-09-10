@@ -1,31 +1,89 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { state } from '@/lib/timeline';
+import { events, valueAt } from '@/lib/events';
+import { CrtScreen, planarUVs } from './CrtScreen';
+
+const MODEL = '/models/nvidia-crt.glb';
 
 /**
- * The hero object, built from geometry rather than a GLB.
+ * The hero object: an NVIDIA CRT monitor, with the live position value
+ * rendered onto its actual screen.
  *
- * Three counter-rotating rings around a displaced core. It is parametric on
- * purpose: `spin` reacts to scroll velocity, so the machine visibly labours
- * during the violent years instead of idling at a constant rate. Swap in a
- * loaded model later by replacing the <group> children — nothing outside this
- * file knows what the machine is made of.
+ * The model is a trimesh export — Z-up, no UVs, no textures, 3k verts. It is
+ * uprighted and centred here so nothing outside this file has to know that.
+ * Two metal rings still orbit it; they are the only survivors of the earlier
+ * procedural machine, and they now read as the field around the device rather
+ * than as the device itself.
  */
 export function TimeMachine() {
   const group = useRef<THREE.Group>(null);
-  const ringA = useRef<THREE.Mesh>(null);
+  const model = useRef<THREE.Group>(null);
   const ringB = useRef<THREE.Mesh>(null);
   const ringC = useRef<THREE.Mesh>(null);
-  const core = useRef<THREE.Mesh>(null);
 
-  const basePositions = useRef<Float32Array | null>(null);
   const lastProgress = useRef(0);
   const velocity = useRef(0);
 
-  const coreGeo = useMemo(() => new THREE.IcosahedronGeometry(1.55, 6), []);
+  const { scene } = useGLTF(MODEL);
+  const screen = useMemo(() => new CrtScreen(), []);
+
+  // Prepare the model once: hide the ground plane it ships with, wire the
+  // canvas onto the Display mesh, and let the glass read as glass.
+  useEffect(() => {
+    scene.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+
+      // GLTFLoader pushes every node name through PropertyBinding
+      // .sanitizeNodeName, which replaces whitespace with underscores. The
+      // authored names ("Convex CRT glass") therefore never match on the way
+      // in — single-word names like "Display" do, which makes the bug look
+      // like it is only affecting some parts. Normalise before comparing.
+      const name = o.name.replace(/_/g, ' ');
+
+      if (name === 'Ground') {
+        o.visible = false;
+        return;
+      }
+
+      if (name === 'Display') {
+        planarUVs(o.geometry);
+        o.material = new THREE.MeshBasicMaterial({
+          map: screen.texture,
+          toneMapped: false,
+        });
+        return;
+      }
+
+      if (name === 'Convex CRT glass') {
+        // Opaque and self-emissive in the source file, which hides the screen
+        // behind a green dome. Make it behave like glass over the tube.
+        o.material = new THREE.MeshPhysicalMaterial({
+          color: '#0B1A12',
+          metalness: 0,
+          roughness: 0.16,
+          transmission: 0.7,
+          thickness: 0.4,
+          transparent: true,
+          opacity: 0.5,
+          depthWrite: false,
+          envMapIntensity: 0.6,
+        });
+        return;
+      }
+
+      // Everything else keeps its authored material but leans harder on the
+      // environment map, which is doing all the lighting in this scene.
+      const m = o.material as THREE.MeshStandardMaterial;
+      if (m && 'envMapIntensity' in m) m.envMapIntensity = 1.6;
+    });
+
+    return () => screen.dispose();
+  }, [scene, screen]);
 
   useFrame((_, delta) => {
     const d = Math.min(delta, 0.05);
@@ -37,7 +95,6 @@ export function TimeMachine() {
     velocity.current += (raw - velocity.current) * 0.08;
     const drive = state.reducedMotion ? 0.25 : 0.25 + Math.min(velocity.current * 9, 3.4);
 
-    if (ringA.current) ringA.current.rotation.z += d * 0.42 * drive;
     if (ringB.current) {
       ringB.current.rotation.z -= d * 0.31 * drive;
       ringB.current.rotation.x = Math.PI / 2.4 + Math.sin(p * 5) * 0.06;
@@ -50,67 +107,42 @@ export function TimeMachine() {
     // The machine recedes as you travel, but never fully leaves.
     if (group.current) {
       group.current.position.z = -p * 26;
-      const s = 1 - p * 0.42;
-      group.current.scale.setScalar(s);
-      group.current.rotation.y = p * 0.7;
+      group.current.scale.setScalar(1 - p * 0.42);
+      // Gentler than the old spin: the screen has to stay readable.
+      group.current.rotation.y = p * 0.32;
     }
 
-    // Vertex displacement on the core — the reference's signature move.
-    if (core.current && !state.reducedMotion) {
-      const geo = core.current.geometry as THREE.IcosahedronGeometry;
-      const pos = geo.attributes.position as THREE.BufferAttribute;
-      if (!basePositions.current) basePositions.current = Float32Array.from(pos.array);
-      const base = basePositions.current;
-      const t = performance.now() * 0.00042;
-      const amp = 0.055 + Math.min(velocity.current * 1.3, 0.2);
-      for (let i = 0; i < pos.count; i++) {
-        const ix = i * 3;
-        const x = base[ix], y = base[ix + 1], z = base[ix + 2];
-        const n =
-          Math.sin(x * 2.1 + t * 2.0) * Math.cos(y * 1.9 - t * 1.4) * Math.sin(z * 2.3 + t);
-        const k = 1 + n * amp;
-        pos.array[ix] = x * k;
-        pos.array[ix + 1] = y * k;
-        pos.array[ix + 2] = z * k;
-      }
-      pos.needsUpdate = true;
-      geo.computeVertexNormals();
+    // Idle float so the device never looks welded in place.
+    if (model.current && !state.reducedMotion) {
+      const t = performance.now() * 0.0006;
+      model.current.rotation.z = Math.sin(t) * 0.022;
+      model.current.position.y = -2.758 + Math.sin(t * 1.3) * 0.06;
     }
+
+    // Feed the tube.
+    const ev = events[state.active];
+    screen.update(
+      valueAt(p),
+      ev.year,
+      ev.return,
+      ev.beat === 'start' ? 'IPO' : ev.beat === 'today' ? 'TODAY' : '',
+      performance.now(),
+    );
   });
 
   return (
     <group ref={group}>
-      <mesh ref={core} geometry={coreGeo}>
-        {/* Polished metal with almost no emission of its own — everything you
-            see on the core is the environment reflected back. Roughness is the
-            main dial: below ~0.2 it mirrors, above ~0.5 the IBL washes out. */}
-        <meshStandardMaterial
-          color="#20281F"
-          emissive="#22350B"
-          emissiveIntensity={0.07}
-          metalness={1}
-          roughness={0.26}
-          envMapIntensity={1.5}
-          flatShading
-        />
-      </mesh>
+      {/* Upright (the export is Z-up) and centre on the origin. */}
+      <group ref={model} rotation={[-Math.PI / 2, 0, 0]} position={[-0.025, -2.758, 0.112]} scale={1.45}>
+        <primitive object={scene} />
+      </group>
 
-      {/* wireframe shell — gives the core an engineered edge the solid lacks */}
-      <mesh geometry={coreGeo} scale={1.035}>
-        <meshBasicMaterial color="#76B900" wireframe transparent opacity={0.09} />
-      </mesh>
-
-      {/* Inner ring stays a true emitter — it is the thing the core reflects. */}
-      <mesh ref={ringA}>
-        <torusGeometry args={[3.1, 0.05, 14, 220]} />
-        <meshStandardMaterial color="#76B900" emissive="#76B900" emissiveIntensity={2.4} toneMapped={false} />
-      </mesh>
-
-      {/* Outer two are metal now, not glow: they pick up the side strips as
-          travelling specular highlights, which is what makes them read as
-          machined rather than drawn. */}
+      {/* Orbiting field, set BEHIND the device: a ring centred on the origin
+          sweeps across the screen face every revolution and makes the readout
+          unreadable. Metal, so the environment gives them travelling arcs. */}
+      <group position={[0, 0, -3.1]}>
       <mesh ref={ringB} rotation={[Math.PI / 2.4, 0, 0]}>
-        <torusGeometry args={[4.25, 0.085, 16, 220]} />
+        <torusGeometry args={[5.2, 0.085, 16, 220]} />
         <meshStandardMaterial
           color="#8FA37E"
           emissive="#2C4406"
@@ -122,7 +154,7 @@ export function TimeMachine() {
       </mesh>
 
       <mesh ref={ringC} rotation={[0.5, 0.4, 0]}>
-        <torusGeometry args={[5.6, 0.055, 14, 240]} />
+        <torusGeometry args={[6.6, 0.055, 14, 240]} />
         <meshStandardMaterial
           color="#A8B79C"
           emissive="#1B2C05"
@@ -132,16 +164,13 @@ export function TimeMachine() {
           envMapIntensity={1.8}
         />
       </mesh>
+      </group>
 
-      {/* portal disc — reads as the mouth of the corridor */}
-      <mesh position={[0, 0, -1.2]}>
-        <circleGeometry args={[2.6, 64]} />
-        <meshBasicMaterial color="#0B2E00" transparent opacity={0.34} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* Kept small and close: the environment does the lighting now, this
-          just puts a warm core glow onto the portal disc behind the rings. */}
-      <pointLight position={[0, 0, 2.2]} intensity={1.4} distance={12} color="#76B900" />
+      {/* Rim from behind only. A light in front of the tube puts a hard
+          specular blob straight across the glass. */}
+      <pointLight position={[0, 0.4, -4.2]} intensity={3.4} distance={16} color="#76B900" />
     </group>
   );
 }
+
+useGLTF.preload(MODEL);
