@@ -81,12 +81,16 @@ export function TimeMachine() {
   return (
     <group ref={group}>
       <mesh ref={core} geometry={coreGeo}>
+        {/* Polished metal with almost no emission of its own — everything you
+            see on the core is the environment reflected back. Roughness is the
+            main dial: below ~0.2 it mirrors, above ~0.5 the IBL washes out. */}
         <meshStandardMaterial
-          color="#141A15"
-          emissive="#2F4A0A"
-          emissiveIntensity={0.16}
-          metalness={0.94}
-          roughness={0.34}
+          color="#20281F"
+          emissive="#22350B"
+          emissiveIntensity={0.07}
+          metalness={1}
+          roughness={0.26}
+          envMapIntensity={1.5}
           flatShading
         />
       </mesh>
@@ -96,19 +100,37 @@ export function TimeMachine() {
         <meshBasicMaterial color="#76B900" wireframe transparent opacity={0.09} />
       </mesh>
 
+      {/* Inner ring stays a true emitter — it is the thing the core reflects. */}
       <mesh ref={ringA}>
-        <torusGeometry args={[3.1, 0.035, 12, 200]} />
+        <torusGeometry args={[3.1, 0.05, 14, 220]} />
         <meshStandardMaterial color="#76B900" emissive="#76B900" emissiveIntensity={2.4} toneMapped={false} />
       </mesh>
 
+      {/* Outer two are metal now, not glow: they pick up the side strips as
+          travelling specular highlights, which is what makes them read as
+          machined rather than drawn. */}
       <mesh ref={ringB} rotation={[Math.PI / 2.4, 0, 0]}>
-        <torusGeometry args={[4.25, 0.022, 10, 200]} />
-        <meshStandardMaterial color="#5E8F12" emissive="#4A7300" emissiveIntensity={1.5} toneMapped={false} />
+        <torusGeometry args={[4.25, 0.085, 16, 220]} />
+        <meshStandardMaterial
+          color="#8FA37E"
+          emissive="#2C4406"
+          emissiveIntensity={0.35}
+          metalness={1}
+          roughness={0.24}
+          envMapIntensity={2.2}
+        />
       </mesh>
 
       <mesh ref={ringC} rotation={[0.5, 0.4, 0]}>
-        <torusGeometry args={[5.6, 0.014, 8, 220]} />
-        <meshStandardMaterial color="#8FA88A" emissive="#2E4A08" emissiveIntensity={0.9} toneMapped={false} />
+        <torusGeometry args={[5.6, 0.055, 14, 240]} />
+        <meshStandardMaterial
+          color="#A8B79C"
+          emissive="#1B2C05"
+          emissiveIntensity={0.2}
+          metalness={1}
+          roughness={0.42}
+          envMapIntensity={1.8}
+        />
       </mesh>
 
       {/* portal disc — reads as the mouth of the corridor */}
@@ -117,7 +139,9 @@ export function TimeMachine() {
         <meshBasicMaterial color="#0B2E00" transparent opacity={0.34} side={THREE.DoubleSide} />
       </mesh>
 
-      <pointLight position={[0, 0, 3.5]} intensity={3.2} distance={18} color="#76B900" />
+      {/* Kept small and close: the environment does the lighting now, this
+          just puts a warm core glow onto the portal disc behind the rings. */}
+      <pointLight position={[0, 0, 2.2]} intensity={1.4} distance={12} color="#76B900" />
     </group>
   );
 }

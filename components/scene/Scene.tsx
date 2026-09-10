@@ -2,6 +2,7 @@
 
 import { Suspense, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Environment, Lightformer } from '@react-three/drei';
 import * as THREE from 'three';
 import { events, SPACING, COUNT, RADIUS, TWIST } from '@/lib/events';
 import { state } from '@/lib/timeline';
@@ -62,11 +63,38 @@ export function Scene({ onOpen, dpr }: { onOpen: (id: string) => void; dpr: numb
       onCreated={({ gl, scene }) => {
         gl.setClearColor('#060706', 1);
         scene.fog = new THREE.Fog('#060706', 40, 190);
+        // IBL produces values well above 1.0 on the metal; filmic tone mapping
+        // rolls those highlights off instead of clipping them to flat white.
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.toneMappingExposure = 1.35;
       }}
     >
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[6, 8, 10]} intensity={1.1} color="#DFF0C8" />
-      <pointLight position={[-10, -6, -30]} intensity={30} distance={90} color="#1E4D00" />
+      {/*
+        Image-based lighting instead of a light rig.
+        The reference gets its depth from an HDR environment map, not from
+        real-time lights. We build the same thing out of Lightformer panels
+        rendered once into a 256px cubemap: no HDR file to fetch, no runtime
+        CDN dependency, and — unlike a stock city HDR — every highlight is
+        placed deliberately on the metal. `frames={1}` bakes it a single time.
+      */}
+      <Environment resolution={256} frames={1}>
+        {/* base fill — keeps the shadow side from going pure black */}
+        <Lightformer form="rect" intensity={0.42} color="#55654F" scale={[60, 60, 1]} position={[0, 0, -18]} />
+
+        {/* key: a green ring behind the machine, the source of the rim */}
+        <Lightformer form="ring" intensity={9} color="#76B900" scale={[11, 11, 1]} position={[0, 1, -13]} />
+
+        {/* cool top light for edge definition on the torus rims */}
+        <Lightformer form="rect" intensity={3.6} color="#DCE8CE" scale={[16, 3, 1]} position={[0, 11, 4]} rotation={[Math.PI / 2, 0, 0]} />
+
+        {/* two raking side strips so the rings read as round, not flat */}
+        <Lightformer form="rect" intensity={2.8} color="#9FC46B" scale={[2.5, 18, 1]} position={[-13, 0, 2]} rotation={[0, Math.PI / 2, 0]} />
+        <Lightformer form="rect" intensity={1.9} color="#5E7F3A" scale={[2.5, 18, 1]} position={[13, 0, 2]} rotation={[0, -Math.PI / 2, 0]} />
+      </Environment>
+
+      {/* One real light remains: it travels with the camera so the machine
+          still has a directional read as it recedes down the corridor. */}
+      <directionalLight position={[4, 6, 9]} intensity={0.55} color="#E4F0D2" />
 
       <Suspense fallback={null}>
         <TimeMachine />
