@@ -68,6 +68,36 @@
 
 /* ---------- Base ---------- */
 
+/* Thin, quiet scrollbars everywhere: a slim lime-tinted thumb, no arrows, no track. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 204, 58, 0.28) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(155, 204, 58, 0.28) padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 204, 58, 0.5) padding-box;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
 *,
 *::before,
 *::after {
@@ -1119,14 +1149,56 @@ html.motion:not(.intro) .hero__status {
 .photo-strip__list {
   display: flex;
   gap: 16px;
+  width: max-content;
   margin: 0;
-  padding: 0 var(--gutter) 14px;
-  overflow-x: auto;
+  padding: 0 var(--gutter);
   list-style: none;
+}
+
+/* Horizontal strips: no visible scrollbar, arrow buttons instead. */
+.scroller__track {
+  overflow-x: auto;
   scroll-snap-type: x mandatory;
   /* snap to the page margin, not the screen edge */
   scroll-padding-inline: var(--gutter);
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  outline-offset: -2px;
+}
+
+.scroller__track::-webkit-scrollbar {
+  display: none;
+}
+
+.scroller__controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 0 var(--gutter);
+}
+
+.scroller__btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.scroller__btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.scroller__btn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .photo-strip__list li {
@@ -2982,9 +3054,146 @@ main.flight-page + .footer {
   color: var(--muted);
 }
 
-.registry__scroll {
-  max-height: 70vh;
-  overflow: auto;
+/* Stock Token list: one clean row per token. */
+.token-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--card-bg);
+  list-style: none;
+  overflow: hidden;
+}
+
+.token-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto 84px;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 20px;
+  border-top: 1px solid var(--card-border);
+  font-size: 0.9375rem;
+  transition: background-color 0.15s;
+}
+
+.token-row:first-child {
+  border-top: 0;
+}
+
+.token-row:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.token-row__sym {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+}
+
+.token-row__name {
+  overflow: hidden;
+  color: var(--fg-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.token-row__addr {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--onchain);
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+
+.token-row__mult {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.token-row__mult.is-adjusted {
+  color: var(--calculated);
+}
+
+.registry__more {
+  margin-top: 18px;
+}
+
+@media (max-width: 640px) {
+  .token-row {
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 12px 16px;
+  }
+
+  .token-row__name {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.875rem;
+  }
+
+  .token-row__addr {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .token-row__mult {
+    display: none;
+  }
+}
+
+/* Current artifact: live metrics card */
+.artifact-metrics {
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.artifact-metrics__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.artifact-metrics__head .card__title {
+  margin-bottom: 0;
+}
+
+.artifact-metrics__status {
+  max-width: 56ch;
+  margin-bottom: 18px;
+  font-size: 0.875rem;
+  color: var(--fg-soft);
+}
+
+.artifact-metrics__status a,
+.mono-link {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--onchain);
+  overflow-wrap: anywhere;
+}
+
+.metric-grid__source {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.metric-grid__value.is-set {
+  font-family: var(--display);
+  font-size: 1.375rem;
+  line-height: 1.1;
+  color: var(--fg);
 }
 
 .year-group {
@@ -3476,6 +3685,159 @@ main.flight-page + .footer {
 @media (max-width: 820px) {
   .footer__inner {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Mobile pass ----------
+   Kept last so it wins over the section rules above. */
+
+@media (max-width: 860px) {
+  /* Grid columns may shrink below their content (the scrolling timeline is wide). */
+  .panel-section .stack__inner,
+  .panel-news__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel-archive .stack__inner {
+    grid-template-rows: none;
+  }
+
+  .panel-section .stack__inner > *,
+  .panel-news__grid > * {
+    min-width: 0;
+  }
+
+  .panel__title {
+    max-width: none;
+  }
+
+  .hero__title {
+    font-size: clamp(2.4rem, 10.5vw, 3.4rem);
+  }
+
+  .hero__lede {
+    font-size: 1rem;
+  }
+
+  .flight-cta__title {
+    font-size: clamp(2rem, 8.5vw, 2.8rem);
+  }
+
+  .flight-cta__stops {
+    margin-top: 28px;
+  }
+
+  .panel__backdrop {
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Quotes: stacked rows instead of a sideways-scrolling table. */
+  .live .quotes-wrap {
+    margin: 0;
+    overflow: visible;
+  }
+
+  .live .quotes,
+  .live .quotes tbody {
+    display: block;
+    min-width: 0;
+  }
+
+  .live .quotes thead {
+    display: none;
+  }
+
+  .live .quotes tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .live .quotes th,
+  .live .quotes td {
+    padding: 0;
+    border: 0;
+  }
+
+  .live .quotes td:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .live .quotes .q__age {
+    justify-self: end;
+  }
+
+  /* Current artifact metrics: one column on narrow phones. */
+  .metric-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Memory lane: smaller cards, pulled closer to the road. */
+  .lane__card {
+    width: 190px;
+    min-height: 240px;
+    margin: -120px 0 0 -95px;
+    padding: 18px;
+    transform: translate3d(calc(var(--side) * 118px), 0, var(--z)) rotateY(calc(var(--side) * -24deg));
+  }
+
+  .lane__year {
+    font-size: 3.4rem;
+  }
+
+  .lane__line {
+    font-size: 0.875rem;
+  }
+
+  .lane__plane {
+    width: 104px;
+    height: 104px;
+    margin-left: -52px;
+  }
+
+  .page {
+    padding-top: calc(var(--header-h) + 6vh);
+  }
+
+  .page__title {
+    font-size: clamp(2.3rem, 10vw, 3.2rem);
+  }
+
+  .page__lede {
+    font-size: 1.0625rem;
+  }
+
+  .footer {
+    padding-top: 48px;
+  }
+}
+
+/* Touch screens: every link and control gets a comfortable tap area. */
+@media (pointer: coarse) {
+  .chain-badge,
+  .panel__place,
+  .record-row__link,
+  .token-row__addr,
+  .news-list__title {
+    padding-block: 10px;
+  }
+
+  .header__tag {
+    padding: 6px 10px;
+  }
+
+  .verify {
+    height: 38px;
+  }
+
+  .flight-prompt__close {
+    width: 40px;
+    height: 40px;
   }
 }
 

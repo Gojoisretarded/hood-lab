@@ -32,7 +32,7 @@ export function SiteFooter() {
           <h2>Follow the Library</h2>
           <SocialLinks />
         </section>
-        <p className="footer__meta">Prototype, September 2026. The privacy policy and terms are being drafted.</p>
+        <p className="footer__meta">&copy; 2026 Robinhood Library. An independent archive.</p>
       </div>
     </footer>
   );

@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { ARCHIVE_PHOTOS } from "@/lib/media";
 import { StatusChip } from "./Chip";
+import { StripScroller } from "./StripScroller";
 
 // Where each print sits in the landing collage, and how fast it drifts (deeper = faster).
 const LAYOUT = [
@@ -43,7 +44,8 @@ export function ArchiveCollage() {
 export function ArchiveStrip() {
   return (
     <section className="photo-strip" aria-label="Archive photos">
-      <ul className="photo-strip__list">
+      <StripScroller label="Archive photos">
+        <ul className="photo-strip__list">
         {ARCHIVE_PHOTOS.map((photo) => (
           <li key={photo.id}>
             <figure className="photo-strip__item">
@@ -56,7 +58,8 @@ export function ArchiveStrip() {
             </figure>
           </li>
         ))}
-      </ul>
+        </ul>
+      </StripScroller>
     </section>
   );
 }

@@ -4,10 +4,18 @@ import { useEffect, useMemo, useState } from "react";
 import type { RegistryPayload } from "@/app/api/chain/tokens/route";
 import { EXPLORER, shortAddress } from "@/lib/archive";
 
-/** Canonical Stock Tokens with a filter that matches ticker, name or any part of the address. */
+// The Library's own watchlist leads; the rest of the registry is one click away.
+const FEATURED = ["GME", "AMC", "HOOD", "TSLA", "NVDA", "AAPL", "MSFT", "AMZN", "META", "GOOGL", "SPY", "QQQ"];
+const INITIAL = 12;
+
+/**
+ * Canonical Stock Tokens. Shows a short list first and lets people open the full registry;
+ * the filter always searches every token (ticker, name or any part of the address).
+ */
 export function TokenRegistry() {
   const [data, setData] = useState<RegistryPayload | null>(null);
   const [query, setQuery] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetch("/api/chain/tokens", { cache: "no-store" })
@@ -16,11 +24,22 @@ export function TokenRegistry() {
       .catch(() => setData({ status: "down", fetchedAt: null, tokens: [] }));
   }, []);
 
-  const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
+  const ordered = useMemo(() => {
     const tokens = data?.tokens ?? [];
-    return q ? tokens.filter((t) => `${t.symbol} ${t.name} ${t.address}`.toLowerCase().includes(q)) : tokens;
-  }, [data, query]);
+    const rank = (s: string) => {
+      const i = FEATURED.indexOf(s);
+      return i === -1 ? FEATURED.length : i;
+    };
+    return [...tokens].sort((a, b) => rank(a.symbol) - rank(b.symbol) || a.symbol.localeCompare(b.symbol));
+  }, [data]);
+
+  const q = query.trim().toLowerCase();
+  const matches = useMemo(
+    () => (q ? ordered.filter((t) => `${t.symbol} ${t.name} ${t.address}`.toLowerCase().includes(q)) : ordered),
+    [ordered, q],
+  );
+  const rows = q || showAll ? matches : matches.slice(0, INITIAL);
+  const total = data?.tokens.length ?? 0;
 
   return (
     <div className="registry">
@@ -29,8 +48,8 @@ export function TokenRegistry() {
           className="field"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter by ticker, name or address"
-          aria-label="Filter Stock Tokens"
+          placeholder="Search all tokens by ticker, name or address"
+          aria-label="Search Stock Tokens"
           spellCheck={false}
         />
         <p className="registry__count" role="status">
@@ -38,38 +57,43 @@ export function TokenRegistry() {
             ? "Loading the registry."
             : data.status === "down"
               ? "Can't reach the asset registry. Try again in a minute."
-              : `${rows.length} of ${data.tokens.length} tokens${data.status === "stale" ? ", last known list" : ""}`}
+              : q
+                ? `${matches.length} of ${total} tokens match`
+                : `Showing ${rows.length} of ${total} tokens${data.status === "stale" ? ", last known list" : ""}`}
         </p>
       </div>
+
       {rows.length > 0 && (
-        <div className="quotes-wrap registry__scroll">
-          <table className="quotes">
-            <thead>
-              <tr>
-                <th scope="col">Token</th>
-                <th scope="col">Contract on chain 4663</th>
-                <th scope="col">Multiplier</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((t) => (
-                <tr key={t.address}>
-                  <th scope="row">
-                    <span className="q__sym">{t.symbol}</span>
-                    <span className="q__name">{t.name}</span>
-                  </th>
-                  <td className="q__contract">
-                    <a href={`${EXPLORER}/token/${t.address}`} target="_blank" rel="noopener noreferrer" title={t.address}>
-                      {shortAddress(t.address)}
-                      <span className="sr-only"> on Blockscout (opens in a new tab)</span>
-                    </a>
-                  </td>
-                  <td className="q__age">{t.multiplier}×</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="token-list">
+          {rows.map((t) => (
+            <li key={t.address} className="token-row">
+              <span className="token-row__sym">{t.symbol}</span>
+              <span className="token-row__name">{t.name}</span>
+              <a
+                className="token-row__addr"
+                href={`${EXPLORER}/token/${t.address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={t.address}
+              >
+                {shortAddress(t.address)}
+                <span className="sr-only"> on Blockscout (opens in a new tab)</span>
+              </a>
+              <span
+                className={`token-row__mult${Number(t.multiplier) === 1 ? "" : " is-adjusted"}`}
+                title={`Corporate-action multiplier: ${t.multiplier}`}
+              >
+                {Number(t.multiplier) === 1 ? "1×" : `${Number(t.multiplier).toFixed(4)}×`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {!q && total > INITIAL && (
+        <button type="button" className="btn btn--quiet registry__more" onClick={() => setShowAll((s) => !s)} aria-expanded={showAll}>
+          {showAll ? "Show fewer" : `Show all ${total} tokens`}
+        </button>
       )}
     </div>
   );

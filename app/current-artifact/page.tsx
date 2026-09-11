@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ArtifactMetrics } from "@/components/ArtifactMetrics";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { LabelChip } from "@/components/Chip";
 import { EXPLORER, STOCK_TOKENS } from "@/lib/archive";
@@ -8,10 +9,12 @@ export const metadata: Metadata = {
   description: "The Library's own independent meme token, documented as the newest artifact. Not launched yet.",
 };
 
-const METRICS = ["Price", "Market cap", "Liquidity", "24h volume", "Holders", "Impact", "Deployment block"];
-
 export default function CurrentArtifact() {
   const gme = STOCK_TOKENS.find((t) => t.symbol === "GME")!;
+  // Set PROJECT_TOKEN_ADDRESS in the environment once the contract is deployed.
+  const contract = /^0x[0-9a-fA-F]{40}$/.test(process.env.PROJECT_TOKEN_ADDRESS ?? "")
+    ? process.env.PROJECT_TOKEN_ADDRESS!
+    : null;
 
   return (
     <main className="page">
@@ -43,29 +46,25 @@ export default function CurrentArtifact() {
             </div>
             <div>
               <dt>Contract</dt>
-              <dd>Not deployed yet</dd>
+              <dd>
+                {contract ? (
+                  <a href={`${EXPLORER}/token/${contract}`} target="_blank" rel="noopener noreferrer" className="mono-link">
+                    {contract}
+                    <span className="sr-only"> on Blockscout (opens in a new tab)</span>
+                  </a>
+                ) : (
+                  "Not deployed yet"
+                )}
+              </dd>
             </div>
             <div>
               <dt>Verification</dt>
-              <dd>Starts when the contract exists</dd>
+              <dd>{contract ? "Under review by the Library" : "Starts when the contract exists"}</dd>
             </div>
           </dl>
         </section>
 
-        <section className="card" aria-labelledby="metrics-title">
-          <h2 className="card__title card__title--small" id="metrics-title">
-            Live metrics
-          </h2>
-          <ul className="metric-grid">
-            {METRICS.map((m) => (
-              <li key={m}>
-                <span>{m}</span>
-                <span className="metric-grid__value">Waiting for deployment</span>
-              </li>
-            ))}
-          </ul>
-          <p className="page__footnote">No placeholder numbers. Each metric appears once it can be read from the chain.</p>
-        </section>
+        <ArtifactMetrics />
       </div>
 
       <section className="page__notes" aria-labelledby="gme-title">
