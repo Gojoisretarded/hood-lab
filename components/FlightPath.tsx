@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Airplane } from "./Airplane";
 
 // The plane and its dotted route.
@@ -10,6 +10,13 @@ import { Airplane } from "./Airplane";
 // them. On scroll the plane holds a fixed height in the viewport and slides along the curve to
 // wherever the route crosses that height. A marker with `data-reveals="<id>"` pops that card
 // open when the plane reaches it, growing out of the exact point the route touches.
+//
+// Scrolling only ever changes transforms, never paint. Phones scroll on the compositor while
+// this script runs on the main thread, so anything painted per frame arrives late and stutters:
+//   - the plane is `position: fixed`, so it already sits at its viewport height while the page
+//     scrolls under it, and the script only nudges it along the curve;
+//   - the flown (lit) route is drawn once and revealed by a clip window made of two opposite
+//     translations (the window slides down, its content slides back up by the same amount).
 
 type Pt = { x: number; y: number };
 type Sample = { l: number; x: number; y: number; ym: number };
@@ -52,12 +59,12 @@ function lengthAtY(samples: Sample[], y: number) {
   return a.l + (b.l - a.l) * t;
 }
 
-function pointAt(samples: Sample[], len: number): Pt {
+function sampleAt(samples: Sample[], len: number) {
   const i = Math.max(0, Math.min(Math.floor(len / STEP), samples.length - 2));
   const a = samples[i];
   const b = samples[i + 1];
   const t = b.l === a.l ? 0 : Math.max(0, Math.min(1, (len - a.l) / (b.l - a.l)));
-  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, ym: a.ym + (b.ym - a.ym) * t };
 }
 
 export function FlightPath({
@@ -72,21 +79,32 @@ export function FlightPath({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const routeRef = useRef<SVGPathElement>(null);
-  const maskRef = useRef<SVGPathElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
+  const litRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
-  const maskId = `flown-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
 
   const [geo, setGeo] = useState({ d: "", w: 0, h: 0 });
   const marks = useRef<{ pts: Pt[]; cards: (HTMLElement | null)[] }>({ pts: [], cards: [] });
   const flight = useRef({
     samples: [] as Sample[],
     total: 0,
+    h: 0,
     waypoints: [] as Waypoint[],
     len: -1,
-    /** Length last written to the DOM; -1 forces a redraw (after a re-measure). */
-    drawn: -1,
+    /** Viewport height, only re-read when the width changes (phone toolbars change the height). */
+    vh: 0,
+    /** Set after a re-measure so the next frame redraws even if the plane hasn't moved. */
+    dirty: true,
     departing: false,
   });
+
+  /** Light the route down to height `y` (in route coordinates). */
+  const reveal = useCallback((y: number) => {
+    const h = flight.current.h;
+    const cut = Math.max(0, Math.min(h, y));
+    if (windowRef.current) windowRef.current.style.transform = `translate3d(0, ${(cut - h).toFixed(1)}px, 0)`;
+    if (litRef.current) litRef.current.style.transform = `translate3d(0, ${(h - cut).toFixed(1)}px, 0)`;
+  }, []);
 
   const measure = useCallback(() => {
     const root = rootRef.current;
@@ -101,6 +119,7 @@ export function FlightPath({
       cards.push(m.dataset.reveals ? document.getElementById(m.dataset.reveals) : null);
     });
     marks.current = { pts, cards };
+    flight.current.vh = window.innerHeight;
     setGeo({ d: catmullRom(pts), w: box.width, h: root.offsetHeight });
   }, []);
 
@@ -142,17 +161,21 @@ export function FlightPath({
       return { l: best, card };
     });
 
-    Object.assign(flight.current, { samples, total, waypoints, drawn: -1 });
+    Object.assign(flight.current, { samples, total, h: geo.h, waypoints, dirty: true });
 
-    if (!document.documentElement.classList.contains("motion")) {
-      maskRef.current?.setAttribute("stroke-dasharray", `${total} 0`);
-    }
-  }, [geo]);
+    // Without motion the whole route is lit; with it, keep what has been flown so far.
+    const f = flight.current;
+    const motion = document.documentElement.classList.contains("motion");
+    reveal(motion ? (f.len < 0 ? 0 : sampleAt(samples, f.len).ym) : geo.h);
+  }, [geo, reveal]);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const motion = document.documentElement.classList.contains("motion");
+    // Touch scrolling is already smooth, so there the plane tracks the page exactly; with a
+    // mouse (and Lenis) a little easing reads as the plane banking into each turn.
+    const ease = window.matchMedia("(pointer: coarse)").matches ? 1 : 0.2;
 
     // Re-measure only when the layout really changes. On phones the address bar showing or
     // hiding fires resize events mid-scroll without changing the width; re-sampling the whole
@@ -186,34 +209,34 @@ export function FlightPath({
     }
 
     let raf = 0;
-    let drawnMask = -1;
+    let lastTop = NaN;
+    let litTo = -1;
     const frame = () => {
       raf = requestAnimationFrame(frame);
       const f = flight.current;
       const plane = planeRef.current;
       if (!plane || f.samples.length < 2 || f.departing) return;
 
-      const top = root.getBoundingClientRect().top;
-      const goal = lengthAtY(f.samples, window.innerHeight * anchor - top);
-      f.len = f.len < 0 ? goal : f.len + (goal - f.len) * 0.2;
-      if (Math.abs(goal - f.len) < 0.1) f.len = goal;
-
+      const box = root.getBoundingClientRect();
+      const goal = lengthAtY(f.samples, f.vh * anchor - box.top);
+      const settled = f.len >= 0 && Math.abs(goal - f.len) < 0.1;
       // Nothing moved since the last frame: skip every DOM write.
-      if (f.drawn >= 0 && Math.abs(f.len - f.drawn) < 0.05) return;
-      if (f.drawn < 0) drawnMask = -1;
-      f.drawn = f.len;
+      if (settled && !f.dirty && box.top === lastTop) return;
+      lastTop = box.top;
+      f.dirty = false;
+      f.len = f.len < 0 || settled ? goal : f.len + (goal - f.len) * ease;
 
-      const p = pointAt(f.samples, f.len);
-      const ahead = pointAt(f.samples, Math.min(f.len + 10, f.total));
-      const behind = pointAt(f.samples, Math.max(f.len - 10, 0));
+      const p = sampleAt(f.samples, f.len);
+      const ahead = sampleAt(f.samples, Math.min(f.len + 10, f.total));
+      const behind = sampleAt(f.samples, Math.max(f.len - 10, 0));
       const angle = Math.atan2(ahead.y - behind.y, ahead.x - behind.x);
 
-      plane.style.transform = `translate3d(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) rotate(${angle.toFixed(4)}rad)`;
+      plane.style.transform = `translate3d(${(p.x + box.left).toFixed(1)}px, ${(p.y + box.top).toFixed(1)}px, 0) rotate(${angle.toFixed(4)}rad)`;
       plane.classList.add("is-ready");
-      // Redrawing the route mask repaints a page-tall SVG, so only do it every few pixels.
-      if (Math.abs(f.len - drawnMask) > 4 || f.len === goal) {
-        drawnMask = f.len;
-        maskRef.current?.setAttribute("stroke-dasharray", `${f.len.toFixed(1)} ${f.total + 40}`);
+
+      if (Math.abs(p.ym - litTo) > 0.5) {
+        litTo = p.ym;
+        reveal(p.ym);
       }
 
       for (const w of f.waypoints) {
@@ -237,26 +260,22 @@ export function FlightPath({
       window.removeEventListener("resize", onResize);
       window.removeEventListener("library:depart", depart);
     };
-  }, [anchor, measure]);
+  }, [anchor, measure, reveal]);
+
+  const box = { width: geo.w, height: geo.h, viewBox: `0 0 ${geo.w || 1} ${geo.h || 1}` };
 
   return (
     <div ref={rootRef} className={`flight ${className}`}>
-      <svg
-        className="flight__route"
-        width={geo.w}
-        height={geo.h}
-        viewBox={`0 0 ${geo.w || 1} ${geo.h || 1}`}
-        aria-hidden="true"
-        focusable="false"
-      >
-        <defs>
-          <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={geo.w} height={geo.h}>
-            <path ref={maskRef} d={geo.d} fill="none" stroke="#fff" strokeWidth="18" strokeDasharray="0 1000000" />
-          </mask>
-        </defs>
+      <svg className="flight__route" {...box} aria-hidden="true" focusable="false">
         <path ref={routeRef} d={geo.d} className="route route--ahead" />
-        <path d={geo.d} className="route route--flown" mask={`url(#${maskId})`} />
       </svg>
+      <div ref={windowRef} className="flight__lit" style={{ height: geo.h }} aria-hidden="true">
+        <div ref={litRef} className="flight__lit-inner">
+          <svg className="flight__lit-svg" {...box} focusable="false">
+            <path d={geo.d} className="route route--flown" />
+          </svg>
+        </div>
+      </div>
       {children}
       <div ref={planeRef} className="flight__plane" aria-hidden="true">
         <div className="plane-body">

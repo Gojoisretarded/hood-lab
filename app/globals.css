@@ -2498,14 +2498,32 @@ html:not(.motion) .lens {
   position: relative;
 }
 
-.flight__route {
+.flight__route,
+.flight__lit {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 0;
-  overflow: visible;
   pointer-events: none;
   mix-blend-mode: difference;
+}
+
+.flight__route,
+.flight__lit-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* The lit route: a clip window slid by transforms (see FlightPath), so revealing it never
+   repaints. */
+.flight__lit {
+  width: 100%;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.flight__lit-inner {
+  will-change: transform;
 }
 
 .route {
@@ -2525,8 +2543,9 @@ html:not(.motion) .lens {
   stroke-width: 3.2;
 }
 
+/* Fixed, so the plane keeps its place on screen while the page scrolls beneath it. */
 .flight__plane {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 2;
@@ -4024,7 +4043,9 @@ main.flight-page + .footer {
     background: color-mix(in srgb, var(--bg) 95%, transparent);
   }
 
-  .flight__route {
+  .flight__route,
+  .flight__lit,
+  .opener__visual {
     mix-blend-mode: normal;
   }
 

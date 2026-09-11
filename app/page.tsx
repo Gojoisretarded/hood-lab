@@ -55,7 +55,7 @@ export default function Home() {
                   ))}
                 </h1>
                 <p className="hero__lede">
-                  <span>An independent library of how Robinhood, meme stocks and crypto changed who gets to invest.</span>{" "}
+                  <span>An independent archive of how Robinhood, meme stocks and crypto changed who gets to invest.</span>{" "}
                   Every claim links to the source it came from.
                 </p>
                 <div className="hero__actions">

@@ -34,7 +34,8 @@ export function SiteHeader() {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const y = (ref.current?.offsetHeight ?? 64) + 2;
-        const under = document.elementsFromPoint(24, y).find((el) => !ref.current?.contains(el));
+        // skip the header itself and the intro, which covers the page for its first seconds
+        const under = document.elementsFromPoint(24, y).find((el) => !ref.current?.contains(el) && !el.closest(".lane"));
         setDark(Boolean(under?.closest(".inverse")));
       });
     };
