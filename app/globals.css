@@ -399,6 +399,52 @@ a {
   color: var(--muted);
 }
 
+/* Social links: X and Telegram */
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.socials__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  color: var(--fg);
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.socials__icon:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.inverse .socials__icon:hover {
+  color: var(--fg);
+}
+
+.socials--labelled {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.socials__link svg {
+  flex: none;
+}
+
+.socials__handle {
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
 @media (max-width: 960px) {
   .nav {
     display: none;
@@ -436,6 +482,11 @@ a {
     height: 1px;
     overflow: hidden;
     clip: rect(0 0 0 0);
+  }
+
+  /* too tight next to the wordmark on phones; the footer carries them there */
+  .header__socials {
+    display: none;
   }
 }
 
@@ -742,11 +793,500 @@ html.intro .lane {
   color: #bcc5bc;
 }
 
+/* The ruins. Extra height so the parallax drift never shows an edge. */
 .hero__bg {
   position: absolute;
-  inset: 0;
+  inset: -6% 0;
   z-index: 0;
   overflow: hidden;
+}
+
+.hero__bg-img {
+  object-fit: cover;
+  object-position: 72% 38%;
+  /* a daylight photo graded down to sit in the night palette */
+  filter: saturate(0.3) contrast(1.12) brightness(0.62);
+  /* the camera pushes in as the next section slides over */
+  scale: calc(1.04 + var(--cover, 0) * 0.16);
+}
+
+/* A lime wash over the grade, so the stone picks up the site's accent. */
+.hero__bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--accent);
+  mix-blend-mode: color;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.motion .hero__bg-img {
+  animation: hero-drift 26s ease-in-out infinite alternate;
+}
+
+@keyframes hero-drift {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: -2.5% -1.5%;
+  }
+}
+
+.hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(10, 14, 10, 0.94) 0%, rgba(10, 14, 10, 0.72) 36%, rgba(10, 14, 10, 0.18) 68%, rgba(10, 14, 10, 0.3) 100%),
+    linear-gradient(0deg, #0a0e0a 0%, rgba(10, 14, 10, 0) 34%),
+    linear-gradient(180deg, rgba(10, 14, 10, 0.7) 0%, rgba(10, 14, 10, 0) 22%);
+  pointer-events: none;
+}
+
+.hero__bg.is-departing .hero__bg-img {
+  scale: 1.38;
+  filter: brightness(1.3) saturate(1.2);
+  transition:
+    scale 0.8s cubic-bezier(0.6, 0, 0.3, 1),
+    filter 0.8s;
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  translate: -50% 0;
+}
+
+.hero__scroll::after {
+  content: "";
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(var(--accent), transparent);
+}
+
+.motion .hero__scroll::after {
+  animation: scroll-cue 2s ease-in-out infinite;
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  51% {
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+/* Entrance: the headline rises in word by word once the intro has lifted. */
+.hero__word {
+  display: inline-block;
+}
+
+.motion .hero__word,
+.motion .hero__lede,
+.motion .hero__actions,
+.motion .hero__status {
+  opacity: 0;
+  translate: 0 0.7em;
+}
+
+html.motion:not(.intro) .hero__word {
+  animation: rise-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: calc(150ms + var(--i) * 60ms);
+}
+
+html.motion:not(.intro) .hero__lede {
+  animation: rise-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.75s forwards;
+}
+
+html.motion:not(.intro) .hero__actions {
+  animation: rise-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s forwards;
+}
+
+html.motion:not(.intro) .hero__status {
+  animation: rise-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) 1.1s forwards;
+}
+
+@keyframes rise-in {
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* The flight button: accent fill, plane glyph, and a ring that keeps calling. */
+.btn--flight {
+  position: relative;
+  background: var(--accent);
+  color: #0a0e0a;
+}
+
+.btn--flight svg {
+  flex: none;
+}
+
+.btn--flight::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1px solid var(--accent);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.motion .btn--flight::after {
+  animation: flight-ring 2.6s ease-out infinite;
+}
+
+@keyframes flight-ring {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.22, 1.5);
+  }
+}
+
+/* Before the chain: archive prints */
+.panel-archive .stack__inner {
+  grid-template-rows: 1fr auto;
+  row-gap: 4vh;
+}
+
+.collage {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
+
+.collage__stage {
+  position: relative;
+  height: min(440px, 50vh);
+}
+
+.collage__print {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--w);
+  padding: 6px 6px 20px;
+  border-radius: 3px;
+  background: #e8ece8;
+  box-shadow: 0 30px 60px -22px rgba(0, 0, 0, 0.75);
+  rotate: var(--r);
+  transition:
+    rotate 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    scale 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.collage__print img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1px;
+  filter: saturate(0.9) contrast(1.03);
+}
+
+.collage__print:hover {
+  z-index: 10 !important;
+  rotate: 0deg;
+  scale: 1.05;
+}
+
+.media-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 52ch;
+  margin-top: 18px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* The flight invitation */
+.panel-flight-cta {
+  background: #050805;
+}
+
+/* Content sits low so the jet stays clear in the middle of the frame. */
+.stack__panel.panel-flight-cta .stack__inner {
+  justify-content: flex-end;
+  padding-bottom: 7vh;
+}
+
+.flight-cta__img {
+  object-fit: cover;
+  object-position: 50% 45%;
+  /* starts close, settles as the section arrives, pushes in again as it leaves */
+  scale: calc(1.28 - var(--enter, 0) * 0.28 + var(--cover, 0) * 0.1);
+}
+
+.flight-cta__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(5, 8, 5, 0) 0%, rgba(5, 8, 5, 0.45) 55%, rgba(5, 8, 5, 0.9) 100%),
+    linear-gradient(0deg, rgba(5, 8, 5, 0.95) 0%, rgba(5, 8, 5, 0) 55%);
+  pointer-events: none;
+}
+
+.flight-cta__stops {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 40px auto 0;
+  padding: 16px 0 0;
+  border-top: 1px dashed var(--outline);
+  list-style: none;
+  text-align: left;
+}
+
+.flight-cta__stops li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--fg-soft);
+}
+
+.flight-cta__stops li span:first-child {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Flight page opener artwork: an atmosphere behind the title, not a framed picture.
+   Screen blending drops the artwork's black ground into the page, so only the glowing
+   panels remain; a radial mask dissolves every edge. */
+.opener__visual {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  width: min(66vw, 980px);
+  opacity: 0.85;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 60% 46%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(ellipse 62% 58% at 60% 46%, #000 35%, transparent 100%);
+}
+
+.opener__visual img {
+  object-fit: cover;
+  object-position: 55% 45%;
+}
+
+.opener__inner {
+  z-index: 1;
+}
+
+/* Newsroom photo strip */
+.photo-strip {
+  margin: 0 calc(-1 * var(--gutter)) 8vh;
+}
+
+.photo-strip__list {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0 var(--gutter) 14px;
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  /* snap to the page margin, not the screen edge */
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: thin;
+}
+
+.photo-strip__list li {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.photo-strip__item {
+  width: 320px;
+  margin: 0;
+}
+
+.photo-strip__item img {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.photo-strip__item figcaption {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.photo-strip__credit {
+  color: var(--pending);
+}
+
+/* The pop-up that invites people onto the flight */
+.flight-prompt {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  z-index: 45;
+  display: grid;
+  grid-template-columns: 84px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: min(600px, calc(100% - 24px));
+  padding: 10px;
+  border: 1px solid rgba(155, 204, 58, 0.24);
+  border-radius: 18px;
+  background: rgba(12, 18, 12, 0.84);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.75),
+    0 0 40px -10px rgba(155, 204, 58, 0.25);
+  color: #e8ece8;
+  opacity: 0;
+  pointer-events: none;
+  scale: 0.6;
+  translate: -50% 40px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition:
+    opacity 0.25s ease,
+    scale 0.6s cubic-bezier(0.2, 1.6, 0.4, 1),
+    translate 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.flight-prompt.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+  scale: 1;
+  translate: -50% 0;
+}
+
+.flight-prompt__thumb {
+  position: relative;
+  width: 84px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.flight-prompt__thumb img {
+  object-fit: cover;
+}
+
+.flight-prompt__title {
+  font-family: var(--display);
+  font-size: 1.1875rem;
+  line-height: 1.15;
+  color: #e8ece8;
+}
+
+.flight-prompt__text {
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #aab4aa;
+}
+
+.flight-prompt__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flight-prompt .btn {
+  height: 40px;
+  white-space: nowrap;
+}
+
+.flight-prompt__close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(232, 236, 232, 0.2);
+  border-radius: 999px;
+  background: transparent;
+  color: #e8ece8;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  .collage__stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    height: auto;
+  }
+
+  .collage__print {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    rotate: none;
+  }
+
+  .flight-cta__stops {
+    grid-template-columns: 1fr;
+  }
+
+  .opener__visual {
+    width: 100%;
+    opacity: 0.45;
+  }
+
+  .flight-prompt {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .flight-prompt__thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .flight-prompt__actions {
+    grid-column: 1 / -1;
+  }
+
+  .flight-prompt__actions .btn {
+    flex: 1;
+  }
 }
 
 /* Panel visual (section imagery) */
@@ -777,7 +1317,7 @@ html.intro .lane {
 
 .flight-cta__bg {
   position: absolute;
-  inset: 0;
+  inset: -8% 0;
   z-index: 0;
   overflow: hidden;
 }
@@ -2182,9 +2722,121 @@ main.flight-page + .footer {
 /* ---------- Inner pages ---------- */
 
 .page {
+  position: relative;
   max-width: calc(var(--maxw) + 2 * var(--gutter));
   margin: 0 auto;
   padding: calc(var(--header-h) + 10vh) var(--gutter) 14vh;
+}
+
+.page > :not(.page-backdrop) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Atmosphere (test): glow, money field, ledger lines, grain ---------- */
+
+/* Full-bleed layer behind an inner page. */
+.page-backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 0;
+  width: 100vw;
+  overflow: hidden;
+  pointer-events: none;
+  translate: -50% 0;
+}
+
+/* 1. A soft lime light behind the page title. */
+.page-backdrop__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: min(90vh, 900px);
+  background:
+    radial-gradient(ellipse 55% 65% at 20% 16%, rgba(155, 204, 58, 0.16), transparent 70%),
+    radial-gradient(ellipse 40% 45% at 88% 0%, rgba(155, 204, 58, 0.08), transparent 70%);
+}
+
+/* 3. The hero's money field, faint and drifting, across the top of the page. */
+.page-backdrop__field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: min(70vh, 640px);
+  color: var(--fg);
+  font-family: var(--mono);
+  opacity: 0.3;
+  -webkit-mask-image: radial-gradient(ellipse 75% 85% at 72% 12%, #000 15%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 85% at 72% 12%, #000 15%, transparent 78%);
+}
+
+/* 4. Ruled ledger lines behind the data pages. */
+.page-backdrop__ledger {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(155, 204, 58, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 204, 58, 0.035) 1px, transparent 1px);
+  background-size:
+    100% 44px,
+    88px 100%;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 80%, transparent 100%);
+}
+
+/* Landing sections get the same glow; the Market section gets the ledger too. */
+.panel-section:not(.inverse)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse 55% 60% at 18% 32%, rgba(155, 204, 58, 0.1), transparent 70%);
+  pointer-events: none;
+}
+
+.panel-section.panel-market::before {
+  background:
+    radial-gradient(ellipse 55% 60% at 18% 32%, rgba(155, 204, 58, 0.1), transparent 70%),
+    linear-gradient(rgba(155, 204, 58, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 204, 58, 0.03) 1px, transparent 1px);
+  background-size:
+    auto,
+    100% 44px,
+    88px 100%;
+}
+
+/* 2. Film grain over everything (below dialogs and the intro). */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 70;
+  background-size: 180px 180px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.motion .grain {
+  animation: grain 0.9s steps(3) infinite;
+}
+
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-3%, 2%);
+  }
+  66% {
+    transform: translate(2%, -3%);
+  }
+  100% {
+    transform: translate(-1%, 1%);
+  }
 }
 
 .page__head {
@@ -2807,6 +3459,10 @@ main.flight-page + .footer {
 
 .legend .chip {
   justify-self: start;
+}
+
+.footer__social {
+  grid-column: 1 / -1;
 }
 
 .footer__meta {

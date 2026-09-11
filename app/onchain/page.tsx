@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageBackdrop } from "@/components/PageBackdrop";
 import { ChainPulse } from "@/components/ChainPulse";
 import { TokenRegistry } from "@/components/TokenRegistry";
 import { EXPLORER } from "@/lib/archive";
@@ -21,6 +22,7 @@ const NETWORK = [
 export default function Onchain() {
   return (
     <main className="page">
+      <PageBackdrop ledger />
       <header className="page__head">
         <p className="page__place">Onchain</p>
         <h1 className="page__title">Robinhood Chain, block by block.</h1>

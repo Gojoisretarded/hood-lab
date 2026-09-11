@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageBackdrop } from "@/components/PageBackdrop";
 import { LabelChip } from "@/components/Chip";
 import { EXPLORER, STOCK_TOKENS } from "@/lib/archive";
 
@@ -14,6 +15,7 @@ export default function CurrentArtifact() {
 
   return (
     <main className="page">
+      <PageBackdrop />
       <header className="page__head">
         <p className="page__place">Current artifact</p>
         <h1 className="page__title">Project token</h1>

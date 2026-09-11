@@ -27,12 +27,23 @@ export function SearchButton({ className, children }: { className?: string; chil
 }
 
 /** A real link to the chapter; with motion allowed the plane takes off first. */
-export function EnterLink({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
+export function EnterLink({
+  href,
+  className,
+  tabIndex,
+  children,
+}: {
+  href: string;
+  className?: string;
+  tabIndex?: number;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   return (
     <Link
       href={href}
       className={className}
+      tabIndex={tabIndex}
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
         if (!document.documentElement.classList.contains("motion")) return;

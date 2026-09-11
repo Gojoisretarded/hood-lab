@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useArchive } from "./ArchiveProvider";
+import { SocialIcons } from "./Socials";
 
 const NAV = [
   { href: "/flight", label: "History" },
@@ -76,6 +77,7 @@ export function SiteHeader() {
           <span className="search-btn__text">Search</span>
           <kbd>{shortcut}</kbd>
         </button>
+        <SocialIcons className="header__socials" />
       </div>
     </header>
   );

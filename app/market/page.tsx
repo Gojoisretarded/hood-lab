@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageBackdrop } from "@/components/PageBackdrop";
 import { LabelChip } from "@/components/Chip";
 import { ImpactWindow } from "@/components/ImpactWindow";
 import { LiveWindow } from "@/components/LiveWindow";
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function Market() {
   return (
     <main className="page">
+      <PageBackdrop ledger />
       <header className="page__head">
         <p className="page__place">Market and Impact</p>
         <h1 className="page__title">What&rsquo;s moving now, and why.</h1>

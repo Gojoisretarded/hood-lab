@@ -1,5 +1,6 @@
 import { LABELS, type Label } from "@/lib/archive";
 import { LabelChip, StatusChip } from "./Chip";
+import { SocialLinks } from "./Socials";
 
 export function SiteFooter() {
   return (
@@ -26,6 +27,10 @@ export function SiteFooter() {
               <span>Stated somewhere, but not yet checked against a source.</span>
             </li>
           </ul>
+        </section>
+        <section className="footer__social">
+          <h2>Follow the Library</h2>
+          <SocialLinks />
         </section>
         <p className="footer__meta">Prototype, September 2026. The privacy policy and terms are being drafted.</p>
       </div>

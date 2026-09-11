@@ -34,7 +34,7 @@ function noise(x: number, y: number) {
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
 }
 
-export function GlyphField({ className = "" }: { className?: string }) {
+export function GlyphField({ className = "", emblem = true }: { className?: string; emblem?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -92,6 +92,13 @@ export function GlyphField({ className = "" }: { className?: string }) {
       cols = Math.ceil(W / cw);
       rows = Math.ceil(H / CELL_H);
 
+      if (!emblem) {
+        // plain drifting field: no feather, just the money glyphs
+        vane = new Float32Array(cols * rows);
+        shaft = new Float32Array(cols * rows);
+        draw(performance.now());
+        return;
+      }
       vane = sampleMask((o) => {
         o.fillStyle = "#fff";
         o.fill(new Path2D(EMBLEM.vane));
@@ -203,7 +210,7 @@ export function GlyphField({ className = "" }: { className?: string }) {
       host.removeEventListener("pointermove", onMove);
       host.removeEventListener("pointerleave", onLeave);
     };
-  }, []);
+  }, [emblem]);
 
   return <canvas ref={ref} className={`glyph-field ${className}`} aria-hidden="true" />;
 }

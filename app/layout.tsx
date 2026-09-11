@@ -3,6 +3,7 @@ import { Geist_Mono, Instrument_Sans, Libre_Caslon_Display } from "next/font/goo
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import { ArchiveProvider } from "@/components/ArchiveProvider";
+import { Grain } from "@/components/Grain";
 import { MemoryLane } from "@/components/MemoryLane";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteHeader />
           {children}
           <SiteFooter />
+          <Grain />
         </ArchiveProvider>
       </body>
     </html>

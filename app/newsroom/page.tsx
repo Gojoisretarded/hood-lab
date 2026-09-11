@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { PageBackdrop } from "@/components/PageBackdrop";
 import Link from "next/link";
 import { VerifyButton } from "@/components/Actions";
+import { ArchiveStrip } from "@/components/ArchivePhotos";
 import { StatusChip } from "@/components/Chip";
 import { ARTIFACTS, artifactHref } from "@/lib/archive";
 
@@ -15,6 +17,7 @@ export default function Newsroom() {
 
   return (
     <main className="page">
+      <PageBackdrop />
       <header className="page__head">
         <p className="page__place">Newsroom</p>
         <h1 className="page__title">Every record, newest first.</h1>
@@ -23,6 +26,8 @@ export default function Newsroom() {
           but still waiting for that check.
         </p>
       </header>
+
+      <ArchiveStrip />
 
       {years.map((year) => (
         <section key={year} className="year-group" aria-labelledby={`y-${year}`}>

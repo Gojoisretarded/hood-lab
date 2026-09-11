@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { VerifyButton } from "@/components/Actions";
 import { ChainPulse } from "@/components/ChainPulse";
 import { StatusChip } from "@/components/Chip";
 import { FlightPath } from "@/components/FlightPath";
-import { Guilloche } from "@/components/Guilloche";
 import { Figure, Moment, Pills, Waypoint } from "@/components/Moment";
 import { ProgressStrip } from "@/components/ProgressStrip";
 import { getArtifact } from "@/lib/archive";
+import { ARTWORK } from "@/lib/media";
 
 export const metadata: Metadata = {
   title: "History flight: the Robinhood Chain era | Robinhood Library",
@@ -34,7 +35,16 @@ export default function Flight() {
     <main className="flight-page">
       <FlightPath>
         <section className="opener" data-artifact="Flight" data-title="The Robinhood Chain era">
-          <Guilloche className="opener__rosette" />
+          <div className="opener__visual">
+            <Image
+              src={ARTWORK.flightGlass.src}
+              alt={ARTWORK.flightGlass.alt}
+              fill
+              preload
+              placeholder="blur"
+              sizes="(max-width: 860px) 80vw, 480px"
+            />
+          </div>
           <Waypoint x="80%" y="30%" xm="86%" ym="22%" />
           <Waypoint x="60%" y="92%" xm="80%" ym="96%" />
           <div className="opener__inner">
