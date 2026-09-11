@@ -103,7 +103,7 @@ export function MemoryLane() {
   if (phase === "done") return null;
 
   return (
-    <div className={`lane inverse${phase === "leaving" ? " is-leaving" : ""}`} role="status" aria-label="Loading Robinhood Library">
+    <div className={`lane inverse${phase === "leaving" ? " is-leaving" : ""}`} role="status" aria-label="Loading Hood Lab">
       <div className="lane__scene" aria-hidden="true">
         <div ref={roadRef} className="lane__road" />
         <div ref={worldRef} className="lane__world">
@@ -132,7 +132,7 @@ export function MemoryLane() {
         </div>
       </div>
 
-      <p className="lane__mark">Robinhood Library</p>
+      <p className="lane__mark">Hood Lab</p>
       <p className="lane__title">Memory lane</p>
       <span ref={yearRef} className="lane__counter" aria-hidden="true">
         2013

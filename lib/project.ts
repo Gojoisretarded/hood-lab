@@ -1,4 +1,4 @@
-// The Library's own token. Its contract address lives in the PROJECT_TOKEN_ADDRESS environment
+// Hood Lab's own token. Its contract address lives in the PROJECT_TOKEN_ADDRESS environment
 // variable (never in a page field, so visitors can't change it). Anything that isn't a
 // well-formed address counts as "not deployed".
 export function projectTokenAddress(): string | null {

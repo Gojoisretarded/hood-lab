@@ -6,8 +6,8 @@ import { EXPLORER, STOCK_TOKENS } from "@/lib/archive";
 import { projectTokenAddress } from "@/lib/project";
 
 export const metadata: Metadata = {
-  title: "Current artifact | Robinhood Library",
-  description: "The Library's own independent meme token, documented as the newest artifact. Not launched yet.",
+  title: "Current artifact | Hood Lab",
+  description: "Hood Lab's own independent meme token, documented as the newest artifact. Not launched yet.",
 };
 
 export default function CurrentArtifact() {
@@ -58,7 +58,7 @@ export default function CurrentArtifact() {
             </div>
             <div>
               <dt>Verification</dt>
-              <dd>{contract ? "Under review by the Library" : "Starts when the contract exists"}</dd>
+              <dd>{contract ? "Under review by Hood Lab" : "Starts when the contract exists"}</dd>
             </div>
           </dl>
         </section>

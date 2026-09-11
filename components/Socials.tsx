@@ -33,13 +33,13 @@ export const SOCIALS = [
 /** Round icon buttons, for the header. */
 export function SocialIcons({ className = "" }: { className?: string }) {
   return (
-    <ul className={`socials ${className}`} aria-label="Follow Robinhood Library">
+    <ul className={`socials ${className}`} aria-label="Follow Hood Lab">
       {SOCIALS.map((s) => (
         <li key={s.id}>
           <a className="socials__icon" href={s.href} target="_blank" rel="noopener noreferrer" title={`${s.label}: ${s.handle}`}>
             {s.icon}
             <span className="sr-only">
-              Robinhood Library on {s.label} (opens in a new tab)
+              Hood Lab on {s.label} (opens in a new tab)
             </span>
           </a>
         </li>
@@ -51,7 +51,7 @@ export function SocialIcons({ className = "" }: { className?: string }) {
 /** Labelled buttons, for the footer. */
 export function SocialLinks() {
   return (
-    <ul className="socials socials--labelled" aria-label="Follow Robinhood Library">
+    <ul className="socials socials--labelled" aria-label="Follow Hood Lab">
       {SOCIALS.map((s) => (
         <li key={s.id}>
           <a className="btn btn--quiet socials__link" href={s.href} target="_blank" rel="noopener noreferrer">

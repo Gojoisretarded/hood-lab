@@ -9,7 +9,7 @@ export function SiteFooter() {
         <section className="footer__notice">
           <h2>An independent archive</h2>
           <p>
-            Robinhood Library is an independent project. It is not affiliated with, endorsed by or operated by Robinhood
+            Hood Lab is an independent project. It is not affiliated with, endorsed by or operated by Robinhood
             Markets, Inc. or GameStop Corp. Names and marks belong to their owners. Nothing here is investment advice.
           </p>
         </section>
@@ -29,10 +29,10 @@ export function SiteFooter() {
           </ul>
         </section>
         <section className="footer__social">
-          <h2>Follow the Library</h2>
+          <h2>Follow Hood Lab</h2>
           <SocialLinks />
         </section>
-        <p className="footer__meta">&copy; 2026 Robinhood Library. An independent archive.</p>
+        <p className="footer__meta">&copy; 2026 Hood Lab. An independent archive.</p>
       </div>
     </footer>
   );

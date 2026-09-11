@@ -5,7 +5,7 @@ import { ImpactWindow } from "@/components/ImpactWindow";
 import { LiveWindow } from "@/components/LiveWindow";
 
 export const metadata: Metadata = {
-  title: "Market and Impact | Robinhood Library",
+  title: "Market and Impact | Hood Lab",
   description: "Live quotes for canonical Stock Tokens and a transparent Impact ranking.",
 };
 
@@ -37,7 +37,7 @@ export default function Market() {
           <li>Anything we can&rsquo;t verify independently is labelled Estimated.</li>
         </ul>
         <p className="page__footnote">
-          <LabelChip label="editorial" /> These rules come from the Library&rsquo;s own methodology.
+          <LabelChip label="editorial" /> These rules come from Hood Lab&rsquo;s own methodology.
         </p>
       </section>
     </main>

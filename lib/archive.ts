@@ -1,4 +1,4 @@
-// The Library's record layer. Shapes follow the developer spec (sections 05, 06, 16):
+// Hood Lab's record layer. Shapes follow the developer spec (sections 05, 06, 16):
 // artifacts carry claims, claims carry a label and a source, sources live in one registry.
 // This file stands in for the PostgreSQL tables until the Admin CMS exists.
 
@@ -46,7 +46,7 @@ export interface Artifact {
 export const LABELS: Record<Label, { name: string; meaning: string }> = {
   verified: { name: "Verified", meaning: "Directly supported by an authoritative source." },
   onchain: { name: "Onchain", meaning: "Observed directly from blockchain data." },
-  calculated: { name: "Calculated", meaning: "Produced by the Library's own formula." },
+  calculated: { name: "Calculated", meaning: "Produced by Hood Lab's own formula." },
   estimated: { name: "Estimated", meaning: "Derived from incomplete or third-party data." },
   editorial: { name: "Editorial", meaning: "Written interpretation, not a sourced fact." },
 };

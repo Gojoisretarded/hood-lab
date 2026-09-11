@@ -11,7 +11,7 @@ const NAV = [
   { href: "/market", label: "Market", note: "Live Stock Token quotes and what moves them" },
   { href: "/onchain", label: "Onchain", note: "Blocks and verified token addresses" },
   { href: "/newsroom", label: "Newsroom", note: "Every record, newest first" },
-  { href: "/current-artifact", label: "Current artifact", note: "The Library's own token" },
+  { href: "/current-artifact", label: "Current artifact", note: "Hood Lab's own token" },
 ];
 
 export function SiteHeader() {
@@ -85,7 +85,7 @@ export function SiteHeader() {
     <header ref={ref} className={`header${dark && !menuOpen ? " inverse" : ""}${menuOpen ? " is-menu-open" : ""}`}>
       <div className="header__inner">
         <Link href="/" className="wordmark">
-          Robinhood Library
+          Hood Lab
         </Link>
         <a href="#independent" className="header__tag">
           Independent<span className="header__tag-more"> archive</span>

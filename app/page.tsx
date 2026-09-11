@@ -235,7 +235,7 @@ export default function Home() {
                 <span>{token ? "Live on Robinhood Chain" : "Not launched"}</span>
               </div>
               <div className="card__main">
-                <h2 className="panel__title panel__title--small">The Library&rsquo;s own token.</h2>
+                <h2 className="panel__title panel__title--small">Hood Lab&rsquo;s own token.</h2>
                 <p>
                   {token
                     ? "An independent meme token, documented as the newest artifact in the archive. Its figures below are read from the chain."

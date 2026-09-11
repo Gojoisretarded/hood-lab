@@ -7,7 +7,7 @@ import { StatusChip } from "@/components/Chip";
 import { ARTIFACTS, artifactHref } from "@/lib/archive";
 
 export const metadata: Metadata = {
-  title: "Newsroom | Robinhood Library",
+  title: "Newsroom | Hood Lab",
   description: "Every record in the archive, newest first, with its sources.",
 };
 

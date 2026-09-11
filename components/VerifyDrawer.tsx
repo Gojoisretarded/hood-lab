@@ -65,7 +65,7 @@ export function VerifyDrawer({ artifactId, onClose }: { artifactId: string | nul
               </div>
               <p>{claim.text}</p>
               <p className="claim__note">
-                {claim.pending ?? (claim.sourceId ? `Backed by ${claim.sourceId}` : "Interpretation by the Library's editors.")}
+                {claim.pending ?? (claim.sourceId ? `Backed by ${claim.sourceId}` : "Interpretation by Hood Lab's editors.")}
               </p>
             </li>
           ))}

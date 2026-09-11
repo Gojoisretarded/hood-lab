@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { RegistryPayload } from "@/app/api/chain/tokens/route";
 import { EXPLORER, shortAddress } from "@/lib/archive";
 
-// The Library's own watchlist leads; the rest of the registry is one click away.
+// Hood Lab's own watchlist leads; the rest of the registry is one click away.
 const FEATURED = ["GME", "AMC", "HOOD", "TSLA", "NVDA", "AAPL", "MSFT", "AMZN", "META", "GOOGL", "SPY", "QQQ"];
 const INITIAL = 12;
 

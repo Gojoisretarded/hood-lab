@@ -5,7 +5,7 @@ import { TokenRegistry } from "@/components/TokenRegistry";
 import { EXPLORER } from "@/lib/archive";
 
 export const metadata: Metadata = {
-  title: "Onchain: Robinhood Chain | Robinhood Library",
+  title: "Onchain: Robinhood Chain | Hood Lab",
   description: "Latest block, network settings and every canonical Stock Token contract on Robinhood Chain.",
 };
 

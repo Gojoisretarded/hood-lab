@@ -11,7 +11,7 @@ import { getArtifact } from "@/lib/archive";
 import { ARTWORK } from "@/lib/media";
 
 export const metadata: Metadata = {
-  title: "History: the Robinhood Chain era | Robinhood Library",
+  title: "History: the Robinhood Chain era | Hood Lab",
   description: "From the Layer 2 announcement in June 2025 to a live mainnet on July 1, 2026, one achievement at a time.",
 };
 

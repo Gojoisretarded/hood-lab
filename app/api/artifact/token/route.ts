@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { projectTokenAddress } from "@/lib/project";
 
-// Live metrics for the Library's own token (the "Current artifact").
+// Live metrics for Hood Lab's own token (the "Current artifact").
 //
 // The contract address comes from the PROJECT_TOKEN_ADDRESS environment variable. Until it
 // is set, the route reports "not-deployed" together with Robinhood Chain's latest block, so
