@@ -238,8 +238,8 @@ export default function Home() {
                 <h2 className="panel__title panel__title--small">Hood Lab&rsquo;s own token.</h2>
                 <p>
                   {token
-                    ? "An independent meme token, documented as the newest artifact in the archive. Its figures below are read from the chain."
-                    : "An independent meme token, documented as the newest artifact in the archive. It isn’t live yet, so there are no numbers to show."}
+                    ? "Documented as the newest artifact in the archive. Its figures below are read from the chain."
+                    : "Documented as the newest artifact in the archive. It isn’t live yet, so there are no numbers to show."}
                 </p>
                 <dl className="token-mini">
                   <div>

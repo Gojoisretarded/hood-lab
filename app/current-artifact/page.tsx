@@ -7,7 +7,7 @@ import { projectTokenAddress } from "@/lib/project";
 
 export const metadata: Metadata = {
   title: "Current artifact | Hood Lab",
-  description: "Hood Lab's own independent meme token, documented as the newest artifact. Not launched yet.",
+  description: "Hood Lab's own token, documented as the newest artifact in the archive. Not launched yet.",
 };
 
 export default function CurrentArtifact() {
@@ -27,9 +27,8 @@ export default function CurrentArtifact() {
           <li>2026</li>
         </ul>
         <p className="page__lede">
-          The market created the stories. The internet created the memes. Crypto put the culture onchain. This is an
-          independent meme project inspired by the history of retail markets, meme stocks and the move to onchain
-          infrastructure.
+          The market created the stories. Crypto put them onchain. Hood Lab&rsquo;s token is an independent project
+          inspired by the history of retail markets and the move to onchain infrastructure.
         </p>
       </header>
 
