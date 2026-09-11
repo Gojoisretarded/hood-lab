@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { projectTokenAddress } from "@/lib/project";
 
 // Live metrics for the Library's own token (the "Current artifact").
 //
@@ -74,10 +75,10 @@ export async function GET() {
   const now = Date.now();
   if (cached && now - cachedAt < CACHE_MS) return NextResponse.json(cached);
 
-  const address = process.env.PROJECT_TOKEN_ADDRESS?.trim() || null;
+  const address = projectTokenAddress();
   const chainBlock = await latestBlock();
 
-  if (!address || !/^0x[0-9a-fA-F]{40}$/.test(address)) {
+  if (!address) {
     cached = { status: "not-deployed", address: null, fetchedAt: new Date(now).toISOString(), chainBlock, token: null };
     cachedAt = now;
     return NextResponse.json(cached);

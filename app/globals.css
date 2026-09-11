@@ -1860,6 +1860,12 @@ html:not(.motion) .lens {
 
 .token-mini dd {
   color: var(--fg);
+  text-align: right;
+}
+
+.token-mini__stale {
+  font-size: 0.8125rem;
+  color: var(--pending);
 }
 
 @media (max-width: 860px), (max-height: 640px) {

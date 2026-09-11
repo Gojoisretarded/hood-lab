@@ -3,6 +3,7 @@ import { ArtifactMetrics } from "@/components/ArtifactMetrics";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { LabelChip } from "@/components/Chip";
 import { EXPLORER, STOCK_TOKENS } from "@/lib/archive";
+import { projectTokenAddress } from "@/lib/project";
 
 export const metadata: Metadata = {
   title: "Current artifact | Robinhood Library",
@@ -12,9 +13,7 @@ export const metadata: Metadata = {
 export default function CurrentArtifact() {
   const gme = STOCK_TOKENS.find((t) => t.symbol === "GME")!;
   // Set PROJECT_TOKEN_ADDRESS in the environment once the contract is deployed.
-  const contract = /^0x[0-9a-fA-F]{40}$/.test(process.env.PROJECT_TOKEN_ADDRESS ?? "")
-    ? process.env.PROJECT_TOKEN_ADDRESS!
-    : null;
+  const contract = projectTokenAddress();
 
   return (
     <main className="page">

@@ -12,8 +12,10 @@ import { HeroBackdrop } from "@/components/HeroBackdrop";
 import { MiniQuotes } from "@/components/MiniQuotes";
 import { Stack } from "@/components/Stack";
 import { Timeline } from "@/components/Timeline";
-import { ARTIFACTS, artifactHref, getArtifact } from "@/lib/archive";
+import { TokenTicker } from "@/components/TokenTicker";
+import { ARTIFACTS, artifactHref, EXPLORER, getArtifact, shortAddress } from "@/lib/archive";
 import { ARTWORK } from "@/lib/media";
+import { projectTokenAddress } from "@/lib/project";
 
 const IMPACT_WEIGHTS = [25, 20, 15, 15, 10, 10, 5];
 const HEADLINE = "The archive of retail markets, crypto and the onchain era";
@@ -32,6 +34,7 @@ function PlaneIcon() {
 export default function Home() {
   const stops = ["RH-2025-001", "RH-2026-001", "RH-2026-002"].map((id) => getArtifact(id)!);
   const latest = [...ARTIFACTS].filter((a) => a.status === "verified").sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  const token = projectTokenAddress();
 
   return (
     <main className="landing">
@@ -229,13 +232,14 @@ export default function Home() {
             <div className="card panel-news__token" data-speed="0.6">
               <div className="card__strip">
                 <span>Current artifact</span>
-                <span>Not launched</span>
+                <span>{token ? "Live on Robinhood Chain" : "Not launched"}</span>
               </div>
               <div className="card__main">
                 <h2 className="panel__title panel__title--small">The Library&rsquo;s own token.</h2>
                 <p>
-                  An independent meme token, documented as the newest artifact in the archive. It isn&rsquo;t live yet,
-                  so there are no numbers to show.
+                  {token
+                    ? "An independent meme token, documented as the newest artifact in the archive. Its figures below are read from the chain."
+                    : "An independent meme token, documented as the newest artifact in the archive. It isn’t live yet, so there are no numbers to show."}
                 </p>
                 <dl className="token-mini">
                   <div>
@@ -244,8 +248,18 @@ export default function Home() {
                   </div>
                   <div>
                     <dt>Contract</dt>
-                    <dd>Not deployed</dd>
+                    <dd>
+                      {token ? (
+                        <a href={`${EXPLORER}/token/${token}`} target="_blank" rel="noopener noreferrer" className="mono-link">
+                          {shortAddress(token)}
+                          <span className="sr-only"> on Blockscout (opens in a new tab)</span>
+                        </a>
+                      ) : (
+                        "Not deployed"
+                      )}
+                    </dd>
                   </div>
+                  {token && <TokenTicker />}
                 </dl>
                 <Link href="/current-artifact" className="btn btn--primary">
                   See the current artifact <span aria-hidden="true">→</span>
