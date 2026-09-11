@@ -6,7 +6,7 @@ import { useArchive } from "./ArchiveProvider";
 
 type Stop = { id: string; title: string; when: string };
 
-/** Bottom bar on the flight: where you are, how far along, and a way out to the rest of the site. */
+/** Bottom bar on the history page: where you are, how far along, and a way out to the rest of the site. */
 export function ProgressStrip({ stops, start }: { stops: Stop[]; start: { id: string; title: string } }) {
   const [now, setNow] = useState(start);
   const [open, setOpen] = useState(false);
@@ -57,7 +57,7 @@ export function ProgressStrip({ stops, start }: { stops: Stop[]; start: { id: st
     <div className="strip">
       {open && (
         <div className="strip__sheet" id="flight-sheet">
-          <ol className="strip__list" aria-label="Moments on this flight">
+          <ol className="strip__list" aria-label="Moments on this page">
             {stops.map((s, i) => (
               <li key={s.id}>
                 <a href={`#${s.id.toLowerCase()}`} onClick={() => setOpen(false)} aria-current={s.id === now.id ? "location" : undefined}>

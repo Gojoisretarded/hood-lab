@@ -48,6 +48,8 @@ export function EnterLink({
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
         if (!document.documentElement.classList.contains("motion")) return;
         e.preventDefault();
+        // fetch the chapter during take-off so it is ready the moment the plane has gone
+        router.prefetch(href);
         window.dispatchEvent(new Event("library:depart"));
         window.setTimeout(() => router.push(href), 640);
       }}

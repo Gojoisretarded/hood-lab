@@ -114,7 +114,7 @@ export function SearchOverlay({
                   <p className="result__summary">{r.artifact.summary}</p>
                   <div className="result__actions">
                     <Link href={artifactHref(r.artifact)} onClick={onClose}>
-                      {r.artifact.place === "flight" ? "Open in the history flight" : "Open in the newsroom"}
+                      {r.artifact.place === "history" ? "Open in the chain history" : "Open in the newsroom"}
                     </Link>
                     <button type="button" onClick={() => onVerify(r.artifact.id)}>
                       Show sources

@@ -514,9 +514,163 @@ a {
     clip: rect(0 0 0 0);
   }
 
-  /* too tight next to the wordmark on phones; the footer carries them there */
+  /* too tight next to the wordmark on phones; the menu and footer carry them there */
   .header__socials {
     display: none;
+  }
+}
+
+/* Menu: the page links, on screens too narrow for the nav row. */
+.menu-btn {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  height: 34px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.menu-btn__bars {
+  display: grid;
+  gap: 4px;
+  width: 14px;
+}
+
+.menu-btn__bars span {
+  display: block;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 0.25s ease;
+}
+
+.menu-btn[aria-expanded="true"] .menu-btn__bars span:first-child {
+  transform: translateY(2.75px) rotate(45deg);
+}
+
+.menu-btn[aria-expanded="true"] .menu-btn__bars span:last-child {
+  transform: translateY(-2.75px) rotate(-45deg);
+}
+
+.header.is-menu-open {
+  background: var(--bg);
+}
+
+/* The header's backdrop blur makes it the containing block, so the sheet hangs from it. */
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  height: calc(100dvh - var(--header-h));
+  padding: 8px var(--gutter) calc(28px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.menu__nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__link {
+  display: grid;
+  gap: 3px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.menu__label {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 7.5vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.menu__note {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.menu__link[aria-current="page"] .menu__label {
+  color: var(--accent);
+}
+
+.menu__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header .menu__search {
+  margin-left: 0;
+  padding: 0 14px 0 12px;
+}
+
+.motion .menu:not([hidden]) {
+  animation: menu-in 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.motion .menu:not([hidden]) .menu__link {
+  animation: menu-link-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.motion .menu__link:nth-child(2) { animation-delay: 0.04s; }
+.motion .menu__link:nth-child(3) { animation-delay: 0.08s; }
+.motion .menu__link:nth-child(4) { animation-delay: 0.12s; }
+.motion .menu__link:nth-child(5) { animation-delay: 0.16s; }
+.motion .menu__link:nth-child(6) { animation-delay: 0.2s; }
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes menu-link-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (max-width: 960px) {
+  .menu-btn {
+    display: inline-flex;
+  }
+}
+
+/* On phones the independence tag moves from the header row into the menu. */
+.menu__tag {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .header__inner > .header__tag {
+    display: none;
+  }
+
+  .menu__tag {
+    display: inline-block;
+    align-self: flex-start;
   }
 }
 
@@ -3844,6 +3998,139 @@ main.flight-page + .footer {
   .flight-prompt__close {
     width: 40px;
     height: 40px;
+  }
+}
+
+/* Phones and tablets: the same look for less GPU work. Backdrop blur, blend modes and a
+   moving full-screen grain all have to be recomposited on every scroll frame, which is what
+   made the flight stutter. Here cards turn solid, the route draws normally and the grain
+   holds still. */
+@media (max-width: 860px), (pointer: coarse) {
+  :root {
+    --card-blur: 0px;
+    --card-bg: rgba(20, 26, 20, 0.94);
+  }
+
+  .card,
+  .header,
+  .photo-strip,
+  .flight-prompt {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .header,
+  .header.inverse {
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
+  }
+
+  .flight__route {
+    mix-blend-mode: normal;
+  }
+
+  .route--ahead {
+    stroke: var(--muted);
+  }
+
+  .route--flown {
+    stroke: var(--accent);
+  }
+
+  .flight__plane {
+    filter: none;
+  }
+
+  .grain {
+    inset: 0;
+  }
+
+  .motion .grain {
+    animation: none;
+  }
+}
+
+/* ---------- Page transitions ----------
+   Moving between pages, the old page lifts away quickly and the new one rises into place.
+   The header stays put as the fixed point. Opacity and transform only, so it stays smooth
+   on phones. */
+
+.header {
+  view-transition-name: site-header;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(site-header) {
+  z-index: 100;
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+}
+
+::view-transition-old(.page-out) {
+  animation: page-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: page-in 0.46s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+/* While a page is on its way, a thin line runs along the foot of the header. */
+.route-progress {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  z-index: 60;
+  width: 100%;
+  height: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--accent);
+}
+
+html.is-routing .route-progress {
+  opacity: 1;
+  transform: scaleX(0.8);
+  transition:
+    opacity 0.2s,
+    transform 2.4s cubic-bezier(0.1, 0.6, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
 

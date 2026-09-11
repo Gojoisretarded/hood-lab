@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 
 declare global {
   interface Window {
@@ -23,8 +23,9 @@ export function SmoothScroll() {
     };
   }, []);
 
-  // A new page starts at the top unless it was opened at a record.
-  useEffect(() => {
+  // A new page starts at the top unless it was opened at a record. This runs before paint so
+  // the page transition captures the new page from its top.
+  useLayoutEffect(() => {
     if (!window.location.hash) window.__lenis?.scrollTo(0, { immediate: true, force: true });
   }, [pathname]);
 

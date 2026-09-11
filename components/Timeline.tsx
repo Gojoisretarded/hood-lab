@@ -7,7 +7,7 @@ export function Timeline() {
       {TIMELINE.map((stop) => {
         const artifact = getArtifact(stop.artifact)!;
         return (
-          <li key={stop.year} className={`timeline__stop${artifact.place === "flight" ? " is-chain" : ""}`}>
+          <li key={stop.year} className={`timeline__stop${artifact.place === "history" ? " is-chain" : ""}`}>
             <Link href={artifactHref(artifact)} className="timeline__link">
               <span className="timeline__year">{stop.year}</span>
               <span className="timeline__event">{stop.event}</span>

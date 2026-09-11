@@ -27,8 +27,8 @@ export interface Claim {
   pending?: string;
 }
 
-/** Where a record lives: the Robinhood Chain flight, or the newsroom archive. */
-export type Place = "flight" | "newsroom";
+/** Where a record lives: the Robinhood Chain history page, or the newsroom archive. */
+export type Place = "history" | "newsroom";
 
 export interface Artifact {
   id: string;
@@ -329,7 +329,7 @@ export const ARTIFACTS: Artifact[] = [
     place: "newsroom",
   },
 
-  // ---- The Robinhood Chain era: the flight ----
+  // ---- The Robinhood Chain era: the history page ----
   {
     id: "RH-2025-001",
     title: "Stock Tokens launch, and a Layer 2 is announced",
@@ -344,7 +344,7 @@ export const ARTIFACTS: Artifact[] = [
       { text: "200+ US stock and ETF tokens for eligible EU customers, launched on Arbitrum.", label: "verified", sourceId: "SRC-RH-2025-001" },
       { text: "Robinhood's own Layer 2, built on Arbitrum, announced as in development.", label: "verified", sourceId: "SRC-RH-2025-001" },
     ],
-    place: "flight",
+    place: "history",
   },
   {
     id: "RH-2026-001",
@@ -360,7 +360,7 @@ export const ARTIFACTS: Artifact[] = [
       { text: "Early infrastructure partners: Alchemy, Allium, Chainlink, LayerZero and TRM.", label: "verified", sourceId: "SRC-RH-2026-001" },
       { text: "Testnet chain ID 46630.", label: "verified", sourceId: "SRC-RHC-002" },
     ],
-    place: "flight",
+    place: "history",
   },
   {
     id: "RH-2026-002",
@@ -376,7 +376,7 @@ export const ARTIFACTS: Artifact[] = [
       { text: "Mainnet chain ID 4663.", label: "verified", sourceId: "SRC-RHC-002" },
       { text: "EVM-compatible, with ETH as the gas token.", label: "verified", sourceId: "SRC-RHC-004" },
     ],
-    place: "flight",
+    place: "history",
   },
   {
     id: "RH-2026-003",
@@ -392,7 +392,7 @@ export const ARTIFACTS: Artifact[] = [
       { text: "Held in Robinhood Wallet and traded 24/7 on Robinhood Chain.", label: "verified", sourceId: "SRC-RH-2026-002" },
       { text: "Not available to US persons or UK residents.", label: "verified", sourceId: "SRC-RHC-003" },
     ],
-    place: "flight",
+    place: "history",
   },
   {
     id: "RH-2026-004",
@@ -408,7 +408,7 @@ export const ARTIFACTS: Artifact[] = [
       { text: "Lending and borrowing available from launch.", label: "verified", sourceId: "SRC-RH-2026-002" },
       { text: "Alchemy, BitGo and Chainlink integrated from day one.", label: "verified", sourceId: "SRC-RH-2026-002" },
     ],
-    place: "flight",
+    place: "history",
   },
 ];
 

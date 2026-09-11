@@ -2,7 +2,7 @@
   "name": "robinhood-library",
   "version": "0.1.0",
   "private": true,
-  "description": "Robinhood Library — an independent archive of retail markets, crypto and the onchain era. Homepage + Chapter 1 prototype.",
+  "description": "Robinhood Library: an independent archive of retail markets, crypto and the onchain era.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

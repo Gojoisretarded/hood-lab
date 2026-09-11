@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { Airplane } from "./Airplane";
 
-/** The landing page's resting plane. Takes off when someone starts the flight. */
+/** The landing page's resting plane. Takes off when someone opens the chain history. */
 export function HeroPlane() {
   const ref = useRef<HTMLDivElement>(null);
 

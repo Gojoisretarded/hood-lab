@@ -64,7 +64,7 @@ export function ChainPulse({ size = "compact" }: { size?: "compact" | "large" })
         )}
       </div>
       <p className="pulse__block" aria-live="off">
-        {block ? n.format(block.number) : "———"}
+        {block ? n.format(block.number) : "…"}
       </p>
       <dl className="pulse__facts">
         <div>
@@ -73,11 +73,11 @@ export function ChainPulse({ size = "compact" }: { size?: "compact" | "large" })
         </div>
         <div>
           <dt>Transactions in block</dt>
-          <dd>{block ? n.format(block.txCount) : "—"}</dd>
+          <dd>{block ? n.format(block.txCount) : "…"}</dd>
         </div>
         <div>
           <dt>Canonical Stock Tokens</dt>
-          <dd>{data?.stockTokens != null ? n.format(data.stockTokens) : "—"}</dd>
+          <dd>{data?.stockTokens != null ? n.format(data.stockTokens) : "…"}</dd>
         </div>
       </dl>
       <p className="pulse__source">

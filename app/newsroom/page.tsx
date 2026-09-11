@@ -46,9 +46,9 @@ export default function Newsroom() {
                   <div className="record-row__body">
                     <h3 className="record-row__title">{r.title}</h3>
                     <p>{r.summary}</p>
-                    {r.place === "flight" && (
+                    {r.place === "history" && (
                       <Link href={artifactHref(r)} className="record-row__link">
-                        See it in the history flight
+                        See it in the chain history
                       </Link>
                     )}
                   </div>

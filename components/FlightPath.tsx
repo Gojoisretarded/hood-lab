@@ -83,6 +83,8 @@ export function FlightPath({
     total: 0,
     waypoints: [] as Waypoint[],
     len: -1,
+    /** Length last written to the DOM; -1 forces a redraw (after a re-measure). */
+    drawn: -1,
     departing: false,
   });
 
@@ -140,7 +142,7 @@ export function FlightPath({
       return { l: best, card };
     });
 
-    Object.assign(flight.current, { samples, total, waypoints });
+    Object.assign(flight.current, { samples, total, waypoints, drawn: -1 });
 
     if (!document.documentElement.classList.contains("motion")) {
       maskRef.current?.setAttribute("stroke-dasharray", `${total} 0`);
@@ -152,10 +154,31 @@ export function FlightPath({
     if (!root) return;
     const motion = document.documentElement.classList.contains("motion");
 
+    // Re-measure only when the layout really changes. On phones the address bar showing or
+    // hiding fires resize events mid-scroll without changing the width; re-sampling the whole
+    // route then would stall the scroll, so height-only resizes are ignored and the rest are
+    // debounced.
+    let measureTimer = 0;
+    let lastWidth = root.clientWidth;
+    let lastHeight = root.offsetHeight;
+    const scheduleMeasure = () => {
+      window.clearTimeout(measureTimer);
+      measureTimer = window.setTimeout(measure, 150);
+    };
+    const onResize = () => {
+      if (root.clientWidth === lastWidth) return;
+      lastWidth = root.clientWidth;
+      scheduleMeasure();
+    };
     measure();
-    const ro = new ResizeObserver(() => measure());
+    const ro = new ResizeObserver(() => {
+      if (root.clientWidth === lastWidth && root.offsetHeight === lastHeight) return;
+      lastWidth = root.clientWidth;
+      lastHeight = root.offsetHeight;
+      scheduleMeasure();
+    });
     ro.observe(root);
-    window.addEventListener("resize", measure);
+    window.addEventListener("resize", onResize);
     document.fonts?.ready.then(measure).catch(() => {});
 
     if (!motion) {
@@ -163,6 +186,7 @@ export function FlightPath({
     }
 
     let raf = 0;
+    let drawnMask = -1;
     const frame = () => {
       raf = requestAnimationFrame(frame);
       const f = flight.current;
@@ -174,6 +198,11 @@ export function FlightPath({
       f.len = f.len < 0 ? goal : f.len + (goal - f.len) * 0.2;
       if (Math.abs(goal - f.len) < 0.1) f.len = goal;
 
+      // Nothing moved since the last frame: skip every DOM write.
+      if (f.drawn >= 0 && Math.abs(f.len - f.drawn) < 0.05) return;
+      if (f.drawn < 0) drawnMask = -1;
+      f.drawn = f.len;
+
       const p = pointAt(f.samples, f.len);
       const ahead = pointAt(f.samples, Math.min(f.len + 10, f.total));
       const behind = pointAt(f.samples, Math.max(f.len - 10, 0));
@@ -181,7 +210,11 @@ export function FlightPath({
 
       plane.style.transform = `translate3d(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) rotate(${angle.toFixed(4)}rad)`;
       plane.classList.add("is-ready");
-      maskRef.current?.setAttribute("stroke-dasharray", `${f.len.toFixed(1)} ${f.total + 40}`);
+      // Redrawing the route mask repaints a page-tall SVG, so only do it every few pixels.
+      if (Math.abs(f.len - drawnMask) > 4 || f.len === goal) {
+        drawnMask = f.len;
+        maskRef.current?.setAttribute("stroke-dasharray", `${f.len.toFixed(1)} ${f.total + 40}`);
+      }
 
       for (const w of f.waypoints) {
         if (w.card && f.len >= w.l - 30 && !w.card.classList.contains("is-open")) {
@@ -199,8 +232,9 @@ export function FlightPath({
 
     return () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(measureTimer);
       ro.disconnect();
-      window.removeEventListener("resize", measure);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("library:depart", depart);
     };
   }, [anchor, measure]);

@@ -59,8 +59,8 @@ export default function Home() {
                   Every claim links to the source it came from.
                 </p>
                 <div className="hero__actions">
-                  <EnterLink href="/flight" className="btn btn--primary btn--flight">
-                    <PlaneIcon /> Start the flight <span aria-hidden="true">→</span>
+                  <EnterLink href="/history" className="btn btn--primary btn--flight">
+                    <PlaneIcon /> Explore the history <span aria-hidden="true">→</span>
                   </EnterLink>
                   <SearchButton className="btn btn--quiet">Search the archive</SearchButton>
                 </div>
@@ -96,7 +96,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* The flight invitation: full-bleed, the plane coming out of the storm */}
+        {/* The invitation to the chain history: full-bleed, the plane coming out of the storm */}
         <section className="stack__panel panel-flight-cta" id="flight-cta" aria-labelledby="cta-title">
           <div className="flight-cta__bg" data-speed="0.25">
             <Image
@@ -110,18 +110,18 @@ export default function Home() {
           </div>
           <div className="stack__inner">
             <div className="flight-cta__content">
-              <p className="flight-cta__kicker">The history flight</p>
+              <p className="flight-cta__kicker">The chain era</p>
               <h2 className="flight-cta__title" id="cta-title">
-                A year that put Robinhood onchain, told in flight.
+                A year that put Robinhood onchain, one moment at a time.
               </h2>
               <p className="flight-cta__lede">
-                Board the plane and scroll. It flies from the Layer 2 announcement in June 2025 to a live mainnet on July
-                1, 2026, and each achievement opens as you reach it.
+                Scroll from the Layer 2 announcement in June 2025 to a live mainnet on July 1, 2026. Each achievement
+                opens as you reach it.
               </p>
-              <EnterLink href="/flight" className="btn btn--primary btn--large btn--flight">
-                <PlaneIcon /> Take the flight <span aria-hidden="true">→</span>
+              <EnterLink href="/history" className="btn btn--primary btn--large btn--flight">
+                <PlaneIcon /> Explore the history <span aria-hidden="true">→</span>
               </EnterLink>
-              <ol className="flight-cta__stops" aria-label="First stops on the flight">
+              <ol className="flight-cta__stops" aria-label="The first moments">
                 {stops.map((a) => (
                   <li key={a.id}>
                     <span>{a.dateLabel}</span>

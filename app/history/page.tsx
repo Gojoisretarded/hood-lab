@@ -11,11 +11,11 @@ import { getArtifact } from "@/lib/archive";
 import { ARTWORK } from "@/lib/media";
 
 export const metadata: Metadata = {
-  title: "History flight: the Robinhood Chain era | Robinhood Library",
+  title: "History: the Robinhood Chain era | Robinhood Library",
   description: "From the Layer 2 announcement in June 2025 to a live mainnet on July 1, 2026, one achievement at a time.",
 };
 
-export default function Flight() {
+export default function History() {
   const reveal = getArtifact("RH-2025-001")!;
   const testnet = getArtifact("RH-2026-001")!;
   const mainnet = getArtifact("RH-2026-002")!;
@@ -34,7 +34,7 @@ export default function Flight() {
   return (
     <main className="flight-page">
       <FlightPath>
-        <section className="opener" data-artifact="Flight" data-title="The Robinhood Chain era">
+        <section className="opener" data-artifact="History" data-title="The Robinhood Chain era">
           <div className="opener__visual">
             <Image
               src={ARTWORK.flightGlass.src}
@@ -48,14 +48,14 @@ export default function Flight() {
           <Waypoint x="80%" y="30%" xm="86%" ym="22%" />
           <Waypoint x="60%" y="92%" xm="80%" ym="96%" />
           <div className="opener__inner">
-            <p className="opener__kicker">History flight</p>
+            <p className="opener__kicker">History</p>
             <h1 className="opener__title">Robinhood Chain</h1>
             <p className="opener__years">June 2025 to today</p>
             <p className="opener__lede">
-              A year from announcement to mainnet. Six moments, each backed by a source you can open. Scroll and the
-              plane flies you through them.
+              A year from announcement to mainnet. Six moments, each backed by a source you can open. Scroll to move
+              through them.
             </p>
-            <p className="opener__cue">Scroll to fly</p>
+            <p className="opener__cue">Scroll to begin</p>
           </div>
         </section>
 
@@ -189,7 +189,7 @@ export default function Flight() {
           <ChainPulse />
         </Moment>
 
-        <section className="flight-end" data-artifact="Flight" data-title="Landed">
+        <section className="flight-end" data-artifact="Today" data-title="Where the chain is now">
           <Waypoint x="50%" y="86%" xm="50%" ym="90%" />
           <p className="flight-end__label">You&rsquo;ve reached today</p>
           <h2 className="flight-end__title">Keep exploring from here.</h2>
@@ -206,7 +206,7 @@ export default function Flight() {
           </div>
         </section>
       </FlightPath>
-      <ProgressStrip stops={stops} start={{ id: "Flight", title: "The Robinhood Chain era" }} />
+      <ProgressStrip stops={stops} start={{ id: "History", title: "The Robinhood Chain era" }} />
     </main>
   );
 }

@@ -5,6 +5,7 @@ import "./globals.css";
 import { ArchiveProvider } from "@/components/ArchiveProvider";
 import { Grain } from "@/components/Grain";
 import { MemoryLane } from "@/components/MemoryLane";
+import { RouteProgress } from "@/components/RouteProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MemoryLane />
           <SmoothScroll />
           <SiteHeader />
+          <RouteProgress />
           {children}
           <SiteFooter />
           <Grain />
