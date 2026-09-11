@@ -1,7 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { ARCHIVE_PHOTOS } from "@/lib/media";
-import { StatusChip } from "./Chip";
 import { StripScroller } from "./StripScroller";
 
 // Where each print sits in the landing collage, and how fast it drifts (deeper = faster).
@@ -16,7 +15,7 @@ const LAYOUT = [
 /** Parallax collage of archive prints for the landing page. */
 export function ArchiveCollage() {
   return (
-    <figure className="collage">
+    <div className="collage">
       <div className="collage__stage">
         {ARCHIVE_PHOTOS.map((photo, i) => {
           const l = LAYOUT[i];
@@ -32,15 +31,14 @@ export function ArchiveCollage() {
           );
         })}
       </div>
-      <figcaption className="media-note">
-        <StatusChip status="pending">Source pending</StatusChip>
-        <span>Archive photos. Who is pictured, when, and the rights to use them are still being confirmed.</span>
-      </figcaption>
-    </figure>
+    </div>
   );
 }
 
-/** A scrolling strip of the same prints, each with its own provenance line. */
+// Captions and credits stay in lib/media.ts until each photo's source is confirmed; they are
+// not shown until then.
+
+/** A scrolling strip of the same prints. */
 export function ArchiveStrip() {
   return (
     <section className="photo-strip" aria-label="Archive photos">
@@ -48,14 +46,9 @@ export function ArchiveStrip() {
         <ul className="photo-strip__list">
         {ARCHIVE_PHOTOS.map((photo) => (
           <li key={photo.id}>
-            <figure className="photo-strip__item">
+            <div className="photo-strip__item">
               <Image src={photo.src} alt={photo.alt} placeholder="blur" sizes="(max-width: 860px) 70vw, 320px" />
-              <figcaption>
-                <span className="rid">{photo.id}</span>
-                <span>{photo.caption}</span>
-                <span className="photo-strip__credit">{photo.credit}</span>
-              </figcaption>
-            </figure>
+            </div>
           </li>
         ))}
         </ul>

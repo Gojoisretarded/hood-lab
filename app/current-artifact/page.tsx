@@ -22,7 +22,7 @@ export default function CurrentArtifact() {
         <p className="page__place">Current artifact</p>
         <h1 className="page__title">Project token</h1>
         <ul className="pills pills--static" aria-label="Classification">
-          <li>Meme</li>
+          <li>Lab</li>
           <li>Current artifact</li>
           <li>2026</li>
         </ul>
