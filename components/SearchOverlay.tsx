@@ -63,7 +63,7 @@ export function SearchOverlay({
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search records, years, tickers or contract addresses"
+            placeholder="Search the archive"
             aria-label="Search the archive"
             spellCheck={false}
           />

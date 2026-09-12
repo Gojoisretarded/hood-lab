@@ -1203,61 +1203,6 @@ html.motion:not(.intro) .hero__status {
   scale: 1.05;
 }
 
-/* The chain history invitation */
-.panel-flight-cta {
-  background: #050805;
-}
-
-/* Content sits low so the jet stays clear in the middle of the frame. */
-.stack__panel.panel-flight-cta .stack__inner {
-  justify-content: flex-end;
-  padding-bottom: 7vh;
-}
-
-.flight-cta__img {
-  object-fit: cover;
-  object-position: 50% 45%;
-  /* starts close, settles as the section arrives, pushes in again as it leaves */
-  scale: calc(1.28 - var(--enter, 0) * 0.28 + var(--cover, 0) * 0.1);
-}
-
-.flight-cta__bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 42%, rgba(5, 8, 5, 0) 0%, rgba(5, 8, 5, 0.45) 55%, rgba(5, 8, 5, 0.9) 100%),
-    linear-gradient(0deg, rgba(5, 8, 5, 0.95) 0%, rgba(5, 8, 5, 0) 55%);
-  pointer-events: none;
-}
-
-.flight-cta__stops {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  margin: 40px auto 0;
-  padding: 16px 0 0;
-  border-top: 1px dashed var(--outline);
-  list-style: none;
-  text-align: left;
-}
-
-.flight-cta__stops li {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.875rem;
-  line-height: 1.35;
-  color: var(--fg-soft);
-}
-
-.flight-cta__stops li span:first-child {
-  font-family: var(--mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
 
 /* Flight page opener artwork: an atmosphere behind the title, not a framed picture.
    Screen blending drops the artwork's black ground into the page, so only the glowing
@@ -1361,6 +1306,37 @@ html.motion:not(.intro) .hero__status {
   height: 240px;
   object-fit: cover;
   border-radius: 6px;
+}
+
+.photo-strip__item figcaption {
+  display: grid;
+  gap: 3px;
+  margin-top: 12px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.photo-strip__caption {
+  color: var(--fg-soft);
+}
+
+.photo-strip__source {
+  justify-self: start;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.photo-strip__source:hover {
+  text-decoration: underline;
+}
+
+.collage__note {
+  max-width: 56ch;
+  margin-top: 16px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 
@@ -1467,10 +1443,6 @@ html.motion:not(.intro) .hero__status {
     rotate: none;
   }
 
-  .flight-cta__stops {
-    grid-template-columns: 1fr;
-  }
-
   .opener__visual {
     width: 100%;
     opacity: 0.45;
@@ -1509,54 +1481,173 @@ html.motion:not(.intro) .hero__status {
   box-shadow: var(--card-shadow);
 }
 
-/* ---------- Flight CTA ---------- */
+/* ---------- Chain history invitation ----------
+   The jet gets its own band across the top of the panel; the words sit below it on the dark
+   ground, so nothing is ever set over the aircraft. The band takes whatever height the text
+   leaves free, within limits. */
 
-.panel-flight-cta .stack__inner {
+.panel-flight-cta {
+  --cta-text: 330px; /* room kept free for the text under the jet */
+  background: #050805;
+}
+
+.stack__panel.panel-flight-cta .stack__inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 80vh;
+  justify-content: flex-end;
+  padding-bottom: 6vh;
 }
 
 .flight-cta__bg {
   position: absolute;
-  inset: -8% 0;
+  top: var(--header-h);
+  right: 0;
+  left: 0;
   z-index: 0;
+  height: clamp(200px, calc(100svh - var(--header-h) - var(--cta-text) - 6vh), 62svh);
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 72%, transparent 100%);
 }
 
+.flight-cta__img {
+  object-fit: cover;
+  object-position: 50% 42%;
+  /* starts close, settles as the section arrives, pushes in again as it leaves */
+  scale: calc(1.2 - var(--enter, 0) * 0.2 + var(--cover, 0) * 0.08);
+}
+
+.flight-cta__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 75% 90% at 50% 45%, rgba(5, 8, 5, 0) 45%, rgba(5, 8, 5, 0.85) 100%);
+  pointer-events: none;
+}
+
+/* Title on the left, the lede and the button on the right, the first moments underneath. */
 .flight-cta__content {
   position: relative;
   z-index: 2;
-  max-width: 680px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-areas:
+    "kicker kicker"
+    "title lede"
+    "title action"
+    "stops stops";
+  column-gap: clamp(32px, 5vw, 80px);
+  align-items: start;
+  width: 100%;
 }
 
 .flight-cta__kicker {
+  grid-area: kicker;
+  margin-bottom: 14px;
   font-family: var(--mono);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 20px;
+  color: var(--accent);
 }
 
 .flight-cta__title {
+  grid-area: title;
+  margin: 0;
   font-family: var(--display);
-  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  font-size: clamp(2rem, 3.6vw, 3.4rem);
   line-height: 1.06;
   color: var(--fg);
   text-wrap: balance;
-  margin-bottom: 18px;
 }
 
 .flight-cta__lede {
-  font-size: 1.125rem;
+  grid-area: lede;
+  max-width: 46ch;
+  margin: 6px 0 22px;
+  font-size: 1.0625rem;
   line-height: 1.55;
   color: var(--fg-soft);
-  max-width: 50ch;
-  margin: 0 auto 36px;
+}
+
+.flight-cta__content > .btn {
+  grid-area: action;
+  justify-self: start;
+}
+
+.flight-cta__stops {
+  grid-area: stops;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 32px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px dashed var(--outline);
+  list-style: none;
+}
+
+.flight-cta__stops li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--fg-soft);
+}
+
+.flight-cta__stops li span:first-child {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Tablets and phones: one column, and the first moments stay on the history page itself. */
+/* Where the landing panels stop being full-screen (phones, short windows) they grow with their
+   content, so the band joins the flow and the words simply follow it. */
+@media (max-width: 860px), (max-height: 640px) {
+  .flight-cta__bg {
+    position: relative;
+    top: auto;
+    height: clamp(200px, 44svh, 420px);
+    margin-top: var(--header-h);
+    transform: none !important;
+  }
+
+  .stack__panel.panel-flight-cta .stack__inner {
+    height: auto;
+    padding-top: 8px;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 860px) {
+  .flight-cta__content {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "kicker"
+      "title"
+      "lede"
+      "action";
+  }
+
+  .flight-cta__title {
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+  }
+
+  .flight-cta__lede {
+    margin: 14px 0 24px;
+    font-size: 1rem;
+  }
+
+  .flight-cta__content > .btn {
+    justify-self: stretch;
+  }
+
+  .flight-cta__stops {
+    display: none;
+  }
 }
 
 .btn--large {
@@ -3637,7 +3728,7 @@ main.flight-page + .footer {
 }
 
 .search__field:focus-within {
-  box-shadow: inset 0 -2px 0 var(--fg);
+  box-shadow: inset 0 -1px 0 var(--accent);
 }
 
 .search__field input {
@@ -3773,6 +3864,39 @@ main.flight-page + .footer {
     align-items: flex-end;
   }
 
+  /* Search on phones: a sheet from the top, clear of the keyboard, with a snug field. */
+  .overlay--search {
+    padding: calc(10px + env(safe-area-inset-top)) 10px 10px;
+  }
+
+  .search {
+    max-height: calc(100dvh - 20px - env(safe-area-inset-top));
+    border-radius: 14px;
+  }
+
+  .search__field {
+    gap: 10px;
+    padding: 0 8px 0 14px;
+  }
+
+  .search__field input {
+    height: 54px;
+    font-size: 1rem;
+  }
+
+  .search__close {
+    height: 36px;
+  }
+
+  .search__hint {
+    padding: 12px 14px;
+    line-height: 1.45;
+  }
+
+  .search__results {
+    padding: 0 4px 10px;
+  }
+
   .drawer {
     height: 88vh;
     border-top: 1px solid var(--rule);
@@ -3875,14 +3999,6 @@ main.flight-page + .footer {
 
   .hero__lede {
     font-size: 1rem;
-  }
-
-  .flight-cta__title {
-    font-size: clamp(2rem, 8.5vw, 2.8rem);
-  }
-
-  .flight-cta__stops {
-    margin-top: 28px;
   }
 
   .panel__backdrop {

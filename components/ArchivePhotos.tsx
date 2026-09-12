@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { ARCHIVE_PHOTOS } from "@/lib/media";
+import { ARCHIVE_PHOTOS, monthYear } from "@/lib/media";
 import { StripScroller } from "./StripScroller";
 
 // Where each print sits in the landing collage, and how fast it drifts (deeper = faster).
@@ -12,10 +12,13 @@ const LAYOUT = [
   { x: "30%", y: "56%", w: "34%", r: "-2deg", speed: 1.1 },
 ];
 
+const PUBLISHERS = [...new Set(ARCHIVE_PHOTOS.map((p) => p.source?.publisher.replace(/ \(.*\)$/, "")).filter(Boolean))];
+const YEARS = ARCHIVE_PHOTOS.map((p) => p.source?.date.slice(0, 4)).filter(Boolean).sort();
+
 /** Parallax collage of archive prints for the landing page. */
 export function ArchiveCollage() {
   return (
-    <div className="collage">
+    <figure className="collage">
       <div className="collage__stage">
         {ARCHIVE_PHOTOS.map((photo, i) => {
           const l = LAYOUT[i];
@@ -31,26 +34,37 @@ export function ArchiveCollage() {
           );
         })}
       </div>
-    </div>
+      <figcaption className="collage__note">
+        Robinhood co-founders Baiju Bhatt and Vladimir Tenev, as the press pictured them from {YEARS[0]} to{" "}
+        {YEARS[YEARS.length - 1]}. Photos via {PUBLISHERS.slice(0, -1).join(", ")} and {PUBLISHERS[PUBLISHERS.length - 1]}.
+      </figcaption>
+    </figure>
   );
 }
 
-// Captions and credits stay in lib/media.ts until each photo's source is confirmed; they are
-// not shown until then.
-
-/** A scrolling strip of the same prints. */
+/** A scrolling strip of the same prints, each with its caption and where it was published. */
 export function ArchiveStrip() {
   return (
     <section className="photo-strip" aria-label="Archive photos">
       <StripScroller label="Archive photos">
         <ul className="photo-strip__list">
-        {ARCHIVE_PHOTOS.map((photo) => (
-          <li key={photo.id}>
-            <div className="photo-strip__item">
-              <Image src={photo.src} alt={photo.alt} placeholder="blur" sizes="(max-width: 860px) 70vw, 320px" />
-            </div>
-          </li>
-        ))}
+          {ARCHIVE_PHOTOS.map((photo) => (
+            <li key={photo.id}>
+              <figure className="photo-strip__item">
+                <Image src={photo.src} alt={photo.alt} placeholder="blur" sizes="(max-width: 860px) 70vw, 320px" />
+                <figcaption>
+                  <span className="photo-strip__caption">{photo.caption}</span>
+                  <span className="photo-strip__credit">Photo: {photo.credit}</span>
+                  {photo.source && (
+                    <a className="photo-strip__source" href={photo.source.url} target="_blank" rel="noopener noreferrer">
+                      {photo.source.publisher}, {monthYear(photo.source.date)}
+                      <span className="sr-only">: {photo.source.title} (opens in a new tab)</span>
+                    </a>
+                  )}
+                </figcaption>
+              </figure>
+            </li>
+          ))}
         </ul>
       </StripScroller>
     </section>

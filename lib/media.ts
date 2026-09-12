@@ -10,10 +10,18 @@ import heroJet from "@/public/images/hero-jet.jpg";
 import heroRuins from "@/public/images/hero-ruins.jpg";
 
 // Media registry (spec section 06: every image carries provenance and a rights note).
-// Alt text describes what is in the frame only. Who is pictured, when and by whom stays
-// "pending" until the source is confirmed, the same way unverified claims are marked.
+// Archive photos take their caption and credit from the article that published them; who is
+// pictured, and who stands where, is only stated as that publisher states it.
 
 export type MediaRights = "pending" | "project" | "cleared";
+
+export interface MediaSource {
+  publisher: string;
+  title: string;
+  /** Publication date, ISO. */
+  date: string;
+  url: string;
+}
 
 export interface Media {
   id: string;
@@ -22,51 +30,81 @@ export interface Media {
   caption: string;
   credit: string;
   rights: MediaRights;
+  source?: MediaSource;
 }
 
-const PENDING_CAPTION = "Subject, date and source to be confirmed.";
 const PENDING_CREDIT = "Source pending";
 
 export const ARCHIVE_PHOTOS: Media[] = [
   {
     id: "MED-PHOTO-001",
     src: willow,
-    alt: "Two people smiling in front of a willow tree, one in a red patterned shirt and one in a grey shirt.",
-    caption: PENDING_CAPTION,
-    credit: PENDING_CREDIT,
+    alt: "Robinhood co-founders Baiju Bhatt and Vladimir Tenev in front of a willow tree.",
+    caption: "Robinhood co-founders Baiju Bhatt and Vladimir Tenev.",
+    credit: "Robinhood",
     rights: "pending",
+    source: {
+      publisher: "Business Insider",
+      title: "Robinhood no-fee trading app raises $50 million",
+      date: "2015-05-07",
+      url: "https://www.businessinsider.com/robinhood-no-fee-trading-app-raises-50-million-2015-5",
+    },
   },
   {
     id: "MED-PHOTO-002",
     src: park,
-    alt: "Two people smiling in a sunlit park, one in a purple zip sweater and one in glasses and a black sweater.",
-    caption: PENDING_CAPTION,
-    credit: PENDING_CREDIT,
+    alt: "Robinhood co-founders Vladimir Tenev, left, and Baiju Bhatt in a sunlit park.",
+    caption: "Robinhood co-founders Vladimir Tenev, left, and Baiju Bhatt.",
+    credit: "Robinhood",
     rights: "pending",
+    source: {
+      publisher: "Business Insider",
+      title: "The race to build Europe's Robinhood: Invstr, Freetrade, Revolut, Dabbl and more",
+      date: "2018-06-07",
+      url: "https://www.businessinsider.com/europe-robinhood-stock-trading-invstr-freetrade-revolut-dabbl-2018-6",
+    },
   },
   {
     id: "MED-PHOTO-003",
     src: muralOffice,
-    alt: "Two people in black standing in an open-plan office in front of a green forest mural, with people at desks behind them.",
-    caption: PENDING_CAPTION,
-    credit: PENDING_CREDIT,
+    alt: "Robinhood co-founders Baiju Bhatt and Vladimir Tenev in their Palo Alto office, in front of a green forest mural.",
+    caption: "Baiju Bhatt and Vladimir Tenev at Robinhood's office in Palo Alto, California, in 2016.",
+    credit: "Aaron Wojack for The New York Times",
     rights: "pending",
+    source: {
+      publisher: "The New York Times",
+      title: "The Silicon Valley Start-Up That Caused Wall Street Chaos",
+      date: "2021-01-30",
+      url: "https://www.nytimes.com/2021/01/30/business/robinhood-wall-street-gamestop.html",
+    },
   },
   {
     id: "MED-PHOTO-004",
     src: chalkboard,
-    alt: "Two people sitting together on a navy couch in front of a chalkboard, one with an arm around the other.",
-    caption: PENDING_CAPTION,
-    credit: PENDING_CREDIT,
+    alt: "Robinhood co-founders Baiju Bhatt and Vladimir Tenev sitting together on a couch in front of a chalkboard.",
+    caption: "Robinhood co-founders Baiju Bhatt and Vladimir Tenev.",
+    credit: "Courtesy of Robinhood",
     rights: "pending",
+    source: {
+      publisher: "Fox Business (Reuters)",
+      title: "Robinhood CEO interested in offering retirement accounts",
+      date: "2021-07-26",
+      url: "https://www.foxbusiness.com/financials/robinhood-ceo-interested-in-offering-retirement-accounts",
+    },
   },
   {
     id: "MED-PHOTO-005",
     src: bench,
-    alt: "Two people in dark T-shirts and jeans by a glass wall, one seated on a wooden bench and one standing beside a plant.",
-    caption: PENDING_CAPTION,
-    credit: PENDING_CREDIT,
+    alt: "Robinhood co-founders Vlad Tenev, left, seated on a bench, and Baiju Bhatt standing beside him.",
+    caption: "Vlad Tenev, left, and Baiju Bhatt, who were classmates at Stanford.",
+    credit: "Ian Bates for The Wall Street Journal",
     rights: "pending",
+    source: {
+      publisher: "The Wall Street Journal",
+      title: "Robinhood Wants to Grow Up",
+      date: "2023-09-16",
+      url: "https://www.wsj.com/finance/investing/robinhood-wants-to-grow-up-1780844e",
+    },
   },
 ];
 
@@ -104,3 +142,8 @@ export const ARTWORK = {
     rights: "project",
   },
 } satisfies Record<string, Media>;
+
+/** "May 2015" */
+export function monthYear(iso: string) {
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+}
