@@ -15,6 +15,8 @@ const instrument = Instrument_Sans({ subsets: ["latin"], variable: "--font-instr
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
+  // Absolute base for the share image and icon links.
+  metadataBase: new URL("https://www.rhoodlab.xyz"),
   title: "Hood Lab",
   description: "An independent archive of retail markets, crypto and the onchain era. Every claim links to its source.",
 };

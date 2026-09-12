@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useArchive } from "./ArchiveProvider";
+import { Logo } from "./Logo";
 import { SocialIcons } from "./Socials";
 
 const NAV = [
@@ -86,7 +87,8 @@ export function SiteHeader() {
     <header ref={ref} className={`header${dark && !menuOpen ? " inverse" : ""}${menuOpen ? " is-menu-open" : ""}`}>
       <div className="header__inner">
         <Link href="/" className="wordmark">
-          Hood Lab
+          <Logo size={34} eager />
+          <span>Hood Lab</span>
         </Link>
         <a href="#independent" className="header__tag">
           Independent<span className="header__tag-more"> archive</span>

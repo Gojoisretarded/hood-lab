@@ -1,5 +1,6 @@
 import { LABELS, type Label } from "@/lib/archive";
 import { LabelChip, StatusChip } from "./Chip";
+import { Logo } from "./Logo";
 import { SocialLinks } from "./Socials";
 
 export function SiteFooter() {
@@ -32,7 +33,10 @@ export function SiteFooter() {
           <h2>Follow Hood Lab</h2>
           <SocialLinks />
         </section>
-        <p className="footer__meta">&copy; 2026 Hood Lab. An independent archive.</p>
+        <p className="footer__meta">
+          <Logo size={28} />
+          <span>&copy; 2026 Hood Lab. An independent archive.</span>
+        </p>
       </div>
     </footer>
   );

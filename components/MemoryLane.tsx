@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Airplane } from "./Airplane";
+import { Logo } from "./Logo";
 
 // Preloader: a walk down memory lane. The plane flies forward along a dotted road while the
 // archive's milestones pass on either side, the year counting up to today. It holds at the
@@ -132,7 +133,10 @@ export function MemoryLane() {
         </div>
       </div>
 
-      <p className="lane__mark">Hood Lab</p>
+      <p className="lane__mark">
+        <Logo size={34} eager />
+        <span>Hood Lab</span>
+      </p>
       <p className="lane__title">Memory lane</p>
       <span ref={yearRef} className="lane__counter" aria-hidden="true">
         2013
